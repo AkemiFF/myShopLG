@@ -1,14 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { Search, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { format } from 'date-fns'
+import { Eye, Search } from 'lucide-react'
+import { useState } from 'react'
 
 // Simulated order data
 const initialOrders = [
@@ -23,7 +23,7 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState(initialOrders)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [selectedOrder, setSelectedOrder] = useState(null)
+  const [selectedOrder, setSelectedOrder] = useState({})
 
   const filteredOrders = orders.filter(order => 
     (order.id.includes(searchTerm) || order.customer.toLowerCase().includes(searchTerm.toLowerCase())) &&
@@ -49,7 +49,7 @@ export default function AdminOrdersPage() {
             <SelectValue placeholder="Tous les statuts" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Tous les statuts</SelectItem>
+            <SelectItem value="tr">Tous les statuts</SelectItem>
             <SelectItem value="En préparation">En préparation</SelectItem>
             <SelectItem value="En cours de livraison">En cours de livraison</SelectItem>
             <SelectItem value="Livré">Livré</SelectItem>

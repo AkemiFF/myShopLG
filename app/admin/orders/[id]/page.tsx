@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { useParams } from 'next/navigation'
-import { format } from 'date-fns'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { format } from 'date-fns'
+import { useParams } from 'next/navigation'
+import { useState } from 'react'
 
 // Simulated order data
 const orderData = {
@@ -29,7 +29,7 @@ export default function AdminOrderDetailPage() {
   const { id } = useParams()
   const [order, setOrder] = useState(orderData)
 
-  const handleStatusChange = (newStatus) => {
+  const handleStatusChange = (newStatus: any) => {
     setOrder({ ...order, status: newStatus })
     // Here you would typically update the status in your backend
   }

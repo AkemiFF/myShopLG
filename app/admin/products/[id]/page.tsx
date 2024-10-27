@@ -1,14 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { useParams } from 'next/navigation'
-import Image from 'next/image'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import Image from 'next/image'
+import { useParams } from 'next/navigation'
+import { useState } from 'react'
 
 // Simulated product data
 const productData = {
@@ -25,12 +25,12 @@ export default function AdminProductDetailPage() {
   const { id } = useParams()
   const [product, setProduct] = useState(productData)
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e:any) => {
     const { name, value } = e.target
     setProduct({ ...product, [name]: value })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e:any) => {
     e.preventDefault()
     // Here you would typically update the product in your backend
     console.log('Updated product:', product)

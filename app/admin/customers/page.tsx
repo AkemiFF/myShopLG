@@ -28,7 +28,7 @@ const orderHistory = [
 export default function AdminCustomersPage() {
   const [customers, setCustomers] = useState(initialCustomers)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCustomer, setSelectedCustomer] = useState(null)
+  const [selectedCustomer, setSelectedCustomer] = useState({})
 
   const filteredCustomers = customers.filter(customer => 
     customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
