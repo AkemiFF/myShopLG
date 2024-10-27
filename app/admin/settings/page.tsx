@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { useState } from 'react'
 
 export default function AdminSettingsPage() {
   const [storeSettings, setStoreSettings] = useState({
@@ -24,27 +24,27 @@ export default function AdminSettingsPage() {
     confirm: '',
   })
 
-  const handleStoreSettingsChange = (e) => {
+  const handleStoreSettingsChange = (e:any) => {
     const { name, value } = e.target
     setStoreSettings(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleToggleChange = (name) => {
-    setStoreSettings(prev => ({ ...prev, [name]: !prev[name] }))
-  }
+  const handleToggleChange = (name: string) => {
+    setStoreSettings(prev => ({ ...prev, [name]: !prev[name]}));
+  };
 
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = (e:any) => {
     const { name, value } = e.target
     setAdminPassword(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleStoreSettingsSubmit = (e) => {
+  const handleStoreSettingsSubmit = (e:any) => {
     e.preventDefault()
     // Here you would typically send the updated settings to your backend
     console.log('Updated store settings:', storeSettings)
   }
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = (e:any) => {
     e.preventDefault()
     // Here you would typically send the new password to your backend
     console.log('Password change request:', adminPassword)
