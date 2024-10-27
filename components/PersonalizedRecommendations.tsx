@@ -1,5 +1,3 @@
-import Image from 'next/image'
-import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
 const recommendedProducts = [
@@ -11,27 +9,20 @@ const recommendedProducts = [
 
 export default function PersonalizedRecommendations() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-      {recommendedProducts.map((product) => (
-        <Card key={product.id}>
-          <CardContent className="p-4">
-            <div className="relative h-40 mb-4">
-              <Image
-                src={product.image}
-                alt={product.name}
-                layout="fill"
-                objectFit="cover"
-                className="rounded-md"
-              />
-            </div>
-            <h3 className="text-md font-semibold">{product.name}</h3>
-            <p className="text-gray-600">{product.price.toFixed(2)} €</p>
-          </CardContent>
-          <CardFooter>
-            <Button variant="outline" className="w-full">Voir le produit</Button>
-          </CardFooter>
-        </Card>
-      ))}
-    </div>
+    <main className="container mx-auto py-8">
+
+
+      {/* Featured Products */}
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {[1, 2, 3, 4].map((product) => (
+          <div key={product} className="bg-white p-4 rounded shadow">
+            <div className="bg-gray-200 h-48 mb-4 rounded"></div>
+            <h3 className="font-semibold mb-2">Product {product}</h3>
+            <p className="text-gray-600 mb-2">$XX.XX</p>
+            <Button className="w-full">Add to Cart</Button>
+          </div>
+        ))}
+      </div>
+    </main>
   )
 }
