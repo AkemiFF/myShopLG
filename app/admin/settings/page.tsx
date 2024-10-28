@@ -24,27 +24,28 @@ export default function AdminSettingsPage() {
     confirm: '',
   })
 
-  const handleStoreSettingsChange = (e:any) => {
+  const handleStoreSettingsChange = (e: any) => {
     const { name, value } = e.target
     setStoreSettings(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleToggleChange = (name: string) => {
-    setStoreSettings(prev => ({ ...prev, [name]: !prev[name]}));
+  const handleToggleChange = (name: keyof typeof storeSettings) => {
+    setStoreSettings(prev => ({ ...prev, [name]: !prev[name] }));
   };
 
-  const handlePasswordChange = (e:any) => {
+
+  const handlePasswordChange = (e: any) => {
     const { name, value } = e.target
     setAdminPassword(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleStoreSettingsSubmit = (e:any) => {
+  const handleStoreSettingsSubmit = (e: any) => {
     e.preventDefault()
     // Here you would typically send the updated settings to your backend
     console.log('Updated store settings:', storeSettings)
   }
 
-  const handlePasswordSubmit = (e:any) => {
+  const handlePasswordSubmit = (e: any) => {
     e.preventDefault()
     // Here you would typically send the new password to your backend
     console.log('Password change request:', adminPassword)

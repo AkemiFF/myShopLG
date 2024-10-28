@@ -1,13 +1,15 @@
+import '@/app/globals.css'
+import Footer from '@/components/Footer'
+import Header from '@/components/Header'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'ShopLG',
   description: 'Des saveurs locales, un monde à portée de main.',
 }
 
-export default function RootLayout({
+export default function UsersLayout({
 
   children,
 }: {
@@ -15,12 +17,14 @@ export default function RootLayout({
 }) {
 
   return (
-    <html lang="fr">
-      <body className={inter.className}>
-        <main className="min-h-screen">
-          {children}
-        </main>
-      </body>
-    </html>
+
+    <>
+      <Header />
+      <main className="min-h-screen">
+        {children}
+      </main>
+      <Footer />
+    </>
+
   )
 }

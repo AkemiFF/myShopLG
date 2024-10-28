@@ -1,9 +1,8 @@
-import React from 'react'
-import { User, Package, MapPin, CreditCard, Settings, ChevronRight, Edit2 } from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Edit2 } from 'lucide-react'
 
 export default function UserProfilePage() {
   const user = {
@@ -30,11 +29,7 @@ export default function UserProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <header className="bg-gray-900 text-white p-4">
-        <div className="container mx-auto">
-          <h1 className="text-2xl font-bold">Amazon Clone</h1>
-        </div>
-      </header>
+
 
       <main className="container mx-auto py-8">
         <div className="flex items-center space-x-4 mb-8">
@@ -170,11 +165,6 @@ export default function UserProfilePage() {
         </Tabs>
       </main>
 
-      <footer className="bg-gray-900 text-white py-8 mt-12">
-        <div className="container mx-auto text-center">
-          <p>&copy; 2023 Amazon Clone. Tous droits réservés.</p>
-        </div>
-      </footer>
     </div>
   )
 }

@@ -1,12 +1,19 @@
-import React from 'react'
-import { Star, X, Plus, ShoppingCart } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Plus, ShoppingCart, Star, X } from 'lucide-react'
+type ProductSpecs = {
+  Écran: string;
+  Processeur: string;
+  RAM: string;
+  Stockage: string;
+  "Appareil photo": string;
+  Batterie: string;
+};
 
 export default function ProductComparisonPage() {
-  const products = [
+  const products: { id: number; name: string; image: string; price: number; rating: number; specs: ProductSpecs }[] = [
     {
       id: 1,
       name: "Smartphone A",
@@ -111,11 +118,14 @@ export default function ProductComparisonPage() {
               <TableRow key={spec}>
                 <TableCell className="font-medium">{spec}</TableCell>
                 {products.map((product) => (
-                  <TableCell key={product.id}>{product.specs[spec] || '-'}</TableCell>
+                  <TableCell key={product.id}>
+                    {product.specs[spec as keyof ProductSpecs] || '-'}
+                  </TableCell>
                 ))}
               </TableRow>
             ))}
           </TableBody>
+
         </Table>
 
         <div className="mt-8">
