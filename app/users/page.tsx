@@ -30,11 +30,11 @@ export default function Homepage() {
         />
         <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
           <div className="text-center text-white">
-            <h1 className="text-4xl font-bold mb-4">Offres exceptionnelles</h1>
-            <p className="text-xl mb-8">Découvrez nos meilleures promotions du moment</p>
+            <h1 className="text-4xl font-bold mb-4">Bienvenue dans MyShopLG</h1>
+            <p className="text-xl mb-8">Des saveurs locales, un monde à portée de main.</p>
             <Link href="/users/products">
               <button className="bg-orange-500 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-orange-600 transition duration-300">
-                Voir les offres
+                Voir les produits
               </button>
             </Link>
           </div>
