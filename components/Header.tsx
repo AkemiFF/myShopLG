@@ -12,7 +12,10 @@ export default function Header() {
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link href="/users">
-            <h1 className="text-2xl font-bold">ShopLG</h1></Link>
+            <h1 className="text-2xl font-bold">
+              <img src="/png/logo1.png" style={{ "height": "80px" }} alt="ShopLG" />
+            </h1>
+          </Link>
         </div>
         <div className="flex-1 max-w-2xl mx-4">
           <div className="relative">

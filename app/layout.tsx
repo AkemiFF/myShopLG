@@ -5,10 +5,10 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'ShopLG',
   description: 'Des saveurs locales, un monde à portée de main.',
+  icons: "/png/favicon.png",
 }
 
 export default function RootLayout({
-
   children,
 }: {
   children: React.ReactNode
