@@ -1,4 +1,5 @@
 import { Product } from "@/lib/store";
+import { addToCart } from "@/utils/base";
 import { MoreHorizontalIcon, Star } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
@@ -21,7 +22,7 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => (
         </div>
         <p className="text-gray-600 mb-2">${product.price}</p>
         <div className="flex items-center space-x-5 mb-2">
-            <Button className="w-fit h-12">Add to Cart</Button>
+            <Button className="w-fit h-12" onClick={() => addToCart(product.id)}>Add to Cart</Button>
             <Link href={`/users/products/${product.id}`}>
                 <Button size="icon" variant="outline" className="w-12 h-12">
                     <MoreHorizontalIcon />

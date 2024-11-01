@@ -21,7 +21,9 @@ export default function HomePage() {
       const data = await response.json()
 
       setProducts(data)
-      setTotalProducts(data.length())
+      setTotalProducts(data.length);
+
+
     } catch (error) {
       console.error("Erreur lors de la récupération des produits :", error)
     }

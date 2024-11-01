@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Product } from '@/lib/store'
 import { API_BASE_URL } from '@/utils/api'
+import { addToCart } from "@/utils/base"
 import { Heart, Share2, Star } from 'lucide-react'
 import { useParams } from "next/navigation"
 import { useEffect, useState } from 'react'
@@ -20,6 +21,8 @@ export default function ProductDetail() {
   useEffect(() => {
     fetchProduct(id);
   }, [id]);
+
+
 
   const reviews = [
     {
@@ -100,7 +103,7 @@ export default function ProductDetail() {
               {product?.description}
             </p>
             <div className="space-y-2">
-              <Button className="w-full">Ajouter au panier</Button>
+              <Button className="w-full" onClick={() => { addToCart(product?.id) }}>Ajouter au panier</Button>
               <Button variant="secondary" className="w-full">Acheter maintenant</Button>
             </div>
             <div className="flex justify-between text-sm text-gray-500">
