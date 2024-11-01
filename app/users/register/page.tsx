@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import toast, { Toaster } from 'react-hot-toast'
 
 export default function RegisterPage() {
   const [name, setName] = useState('')
@@ -14,15 +16,22 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [acceptTerms, setAcceptTerms] = useState(false)
-
+  const rooter = useRouter();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically handle the registration logic
-    console.log('Registration attempt with:', { name, email, password, confirmPassword, acceptTerms })
+
+    if (password !== confirmPassword) {
+      toast.error('Les mots de passe ne correspondent pas.')
+      return
+    }
+
+    rooter.push('/users/register/verification');
   }
 
   return (
     <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-screen">
+      <Toaster position="top-center" reverseOrder={false} />
+
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Inscription</CardTitle>
@@ -86,11 +95,11 @@ export default function RegisterPage() {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={!acceptTerms}>
-              S'inscrire
+              Continuer
             </Button>
             <div className="text-center text-sm">
               Vous avez déjà un compte ?{' '}
-              <Link href="/login" className="text-blue-600 hover:underline">
+              <Link href="/users/login" className="text-blue-600 hover:underline">
                 Se connecter
               </Link>
             </div>
