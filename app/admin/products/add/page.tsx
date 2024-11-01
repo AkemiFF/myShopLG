@@ -11,8 +11,10 @@ import { Textarea } from "@/components/ui/textarea"
 import { Category } from "@/lib/store"
 import { API_BASE_URL } from "@/utils/api"
 import { fetchCategories } from "@/utils/base"
+import getAccessToken from "@/utils/cookies"
 import { Plus, Upload } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { AwaitedReactNode, JSXElementConstructor, ReactElement, ReactNode, useEffect, useState } from 'react'
+import { toast, ToastContentProps } from "react-toastify"
 
 
 export default function Component() {
@@ -36,8 +38,62 @@ export default function Component() {
     const [sku, setSku] = useState("");
     const [quantity, setQuantity] = useState<number | "">("");
 
-    // État pour "Selling Type"
-    const [sellingType, setSellingType] = useState("in-store");
+    function validateProductData(productData: { [x: string]: any }, specifications: string | any[]) {
+        const requiredFields = [
+            'name',
+            'description',
+            'category',
+            'weight',
+            'weightUnit',
+            'length',
+            'width',
+            'height',
+            'price',
+            'comparePrice',
+            'sku',
+            'quantity',
+            'sellingType',
+
+        ];
+
+        // Check if all required fields are present in productData
+        for (const field of requiredFields) {
+            if (!productData[field]) {
+                // Show a toast message if a required field is missing
+                showToast(`Le champ ${field} est requis.`);
+                return false; // Validation fails
+            }
+        }
+
+        // Check if specifications are provided and if they are in the correct format
+        if (!specifications || specifications.length === 0) {
+            showToast("Au moins une spécification est requise.");
+            return false; // Validation fails
+        }
+        if (!images || images.length === 0) {
+            showToast("Au moins une images est requise.");
+            return false; // Validation fails
+        }
+
+
+        // Check if each specification has the required properties
+        for (const spec of specifications) {
+            if (!spec.name || !spec.value) {
+                showToast("Chaque spécification doit avoir un nom et une valeur.");
+                return false; // Validation fails
+            }
+        }
+
+        return true; // Validation passes
+    }
+
+    function showToast(message: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<AwaitedReactNode> | ((props: ToastContentProps<unknown>) => ReactNode) | null | undefined) {
+        toast.warn(message, {
+            theme: "colored",
+            autoClose: 3000,
+        });
+    } const [sellingType, setSellingType] = useState("in-store");
+
     async function createProduct() {
         const productData = {
             name: productName,
@@ -56,8 +112,13 @@ export default function Component() {
             specifications: specifications,
         };
 
+        const isValid = validateProductData(productData, specifications);
+        if (!isValid) {
+            return;
+        }
+
         const formData = new FormData();
-        // Ajout des images au FormData
+
         images.forEach((image) => {
             formData.append('images', image);
         });
@@ -81,10 +142,15 @@ export default function Component() {
             formData.append('specifications', JSON.stringify(specification));
         });
 
+
+        const access = await getAccessToken();
         try {
             const response = await fetch(`${API_BASE_URL}api/product/create/`, {
                 method: 'POST',
                 body: formData,
+                headers: {
+                    'Authorization': `Bearer ${access}`
+                },
             });
 
             if (!response.ok) {
@@ -92,15 +158,32 @@ export default function Component() {
             }
 
             const responseData = await response.json();
+            toast.success('Produit créé avec succès!', {
+                theme: "colored",
+                autoClose: 3000,
+            });
+
             console.log('Produit créé avec succès:', responseData);
             return responseData;
         } catch (error) {
             console.error('Erreur lors de la création du produit:', error);
+            toast.error('Une erreur s\'est produite lors de la création du produit.', {
+                theme: "colored",
+                autoClose: 3000,
+            });
             throw error;
         }
     }
 
 
+    const updateSpecification = (index: number, field: string, value: string) => {
+        const newSpecifications = [...specifications];
+        newSpecifications[index] = {
+            ...newSpecifications[index], // Keep other fields unchanged
+            [field]: value, // Update the specific field (either 'name' or 'value')
+        };
+        setSpecifications(newSpecifications);
+    };
 
     const resetForm = () => {
         setSpecifications([{ name: '', value: '' }]);
@@ -378,50 +461,40 @@ export default function Component() {
                             </CardContent>
                         </Card>
 
-                        <Card>
-                            <CardContent className="p-6 space-x-4 space-y-4">
+                        <Card className="w-full max-w-2xl">
+                            <CardContent className="p-6">
                                 <h2 className="text-lg font-semibold mb-4">Specifications</h2>
-                                <div className="flex flex-wrap space-x-4">
+                                <div className="space-y-4">
                                     {specifications.map((spec, index) => (
-                                        <div key={index} className="mb-4"> {/* Add a key prop here */}
+                                        <div key={index} className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <Label htmlFor={`spec-name-${index}`}>Name</Label>
                                                 <Input
                                                     id={`spec-name-${index}`}
                                                     placeholder="Enter name"
                                                     value={spec.name}
-                                                    onChange={(e) => {
-                                                        const newSpecifications = [...specifications];
-                                                        newSpecifications[index].name = e.target.value;
-                                                        setSpecifications(newSpecifications);
-                                                    }}
+                                                    onChange={(e) => updateSpecification(index, 'name', e.target.value)}
                                                 />
                                             </div>
                                             <div>
                                                 <Label htmlFor={`spec-value-${index}`}>Value</Label>
                                                 <Input
                                                     id={`spec-value-${index}`}
-                                                    placeholder="Enter description"
+                                                    placeholder="Enter value"
                                                     value={spec.value}
-                                                    onChange={(e) => {
-                                                        const newSpecifications = [...specifications];
-                                                        newSpecifications[index].value = e.target.value;
-                                                        setSpecifications(newSpecifications);
-                                                    }}
+                                                    onChange={(e) => updateSpecification(index, 'value', e.target.value)}
                                                 />
                                             </div>
                                         </div>
                                     ))}
-
-                                    <Button
-                                        variant="outline"
-                                        className="w-full"
-                                        onClick={() => setSpecifications([...specifications, { name: '', value: '' }])} // Ajoute une nouvelle spécification vide
-                                    >
-                                        <Plus className="h-4 w-4 mr-2" /> Add Variant
-                                    </Button>
                                 </div>
-
+                                <Button
+                                    variant="outline"
+                                    className="w-full mt-4"
+                                    onClick={addSpecification}
+                                >
+                                    <Plus className="h-4 w-4 mr-2" /> Add Specification
+                                </Button>
                             </CardContent>
                         </Card>
                     </div>
