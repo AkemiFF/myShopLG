@@ -1,14 +1,20 @@
 "use client"
-import { useStoreSettings } from '@/context/StoreSettingsContext';
+import { useUser } from "@/context/UserContext";
 
-export default function Layout() {
-    const { storeSettings } = useStoreSettings();
+const Profile = () => {
+    const { user, setUser } = useUser();
+
+    if (!user) {
+        return <p>Utilisateur non connecté</p>;
+    }
 
     return (
         <div>
-            <h1>{storeSettings.name}</h1>
-            <p>{storeSettings.email}</p>
-            {/* Autres contenus... */}
+            <h1>Bonjour, {user.name}!</h1>
+            <p>Email: {user.email}</p>
+            <button onClick={() => setUser(null)}>Se déconnecter</button>
         </div>
     );
-}
+};
+
+export default Profile;
