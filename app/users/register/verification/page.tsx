@@ -4,14 +4,17 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { API_BASE_URL } from '@/utils/api'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Toaster } from 'react-hot-toast'
+import { toast } from 'react-toastify'
 
 export default function ConfirmCodePage() {
   const [code, setCode] = useState('')
   const [accept, setAccept] = useState(false);
-
+  const router = useRouter();
   useEffect(() => {
     if (code.length === 6) {
       setAccept(true);
@@ -22,11 +25,41 @@ export default function ConfirmCodePage() {
       setAccept(false);
     }
   }, [code]);
+  async function verifyCode(email: any, code: any) {
+    try {
+      const response = await fetch(`${API_BASE_URL}api/verify-code/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, code }),
+      });
 
-  const handleSubmit = () => {
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData, {
+          theme: "colored",
+          autoClose: 3000,
+        });
+        return { success: false, error: errorData };
+      }
 
-    // ...
-    console.log('Registration attempt with:', { code })
+      const data = await response.json();
+      toast.success("Compte vérifié", {
+        theme: "colored",
+        autoClose: 3000,
+      });
+      return { success: true, data };
+    } catch (error) {
+      console.error('Erreur de requête:', error);
+      return { success: false, error };
+    }
+  }
+  const handleSubmit = async () => {
+
+    const email = localStorage.getItem("email_register");
+    const res = await verifyCode(email, code)
+    router.push("/users/login");
   }
 
   return (

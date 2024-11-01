@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { API_BASE_URL } from '@/utils/api'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -17,6 +18,33 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [acceptTerms, setAcceptTerms] = useState(false)
   const rooter = useRouter();
+  async function registerUser(username: any, first_name: any, email: any, password: any) {
+    try {
+      const response = await fetch(`${API_BASE_URL}api/register/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, first_name, email, password }),
+      });
+
+      if (!response.ok) {
+        // Affiche les erreurs de validation si la réponse n'est pas 201 Created
+        const errorData = await response.json();
+        toast.error(errorData.message,
+          { duration: 2000 });
+        return { success: false, error: errorData };
+      }
+
+      const data = await response.json();
+      console.log('Utilisateur créé avec succès:', data);
+      return { success: true, data };
+    } catch (error) {
+      console.error('Erreur de requête:', error);
+      return { success: false, error };
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -24,7 +52,9 @@ export default function RegisterPage() {
       toast.error('Les mots de passe ne correspondent pas.')
       return
     }
-
+    const username = name.split(' ')[0]
+    registerUser(username, name, email, password);
+    localStorage.setItem('email_register', email)
     rooter.push('/users/register/verification');
   }
 

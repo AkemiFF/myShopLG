@@ -1,15 +1,15 @@
+"use client"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useUser } from "@/context/UserContext"
 import { Edit2 } from 'lucide-react'
 
 export default function UserProfilePage() {
-  const user = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    avatar: "/placeholder.svg?height=100&width=100"
-  }
+  const { user, setUser } = useUser();
+  console.log(user);
+
 
   const orders = [
     { id: "123-4567890-1234567", date: "27 octobre 2023", total: 125.97, status: "Livré" },
@@ -34,12 +34,13 @@ export default function UserProfilePage() {
       <main className="container mx-auto py-8">
         <div className="flex items-center space-x-4 mb-8">
           <Avatar className="h-20 w-20">
-            <AvatarImage src={user.avatar} alt={user.name} />
-            <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+            <AvatarImage src="/placeholder.svg?height=100&width=100" alt={user?.username} />
+            <AvatarFallback>{user?.username?.split(' ').map((n) => n[0]).join('')}</AvatarFallback>
+
           </Avatar>
           <div>
-            <h1 className="text-3xl font-bold">{user.name}</h1>
-            <p className="text-gray-600">{user.email}</p>
+            <h1 className="text-3xl font-bold">{user?.username}</h1>
+            <p className="text-gray-600">{user?.email}</p>
           </div>
         </div>
 
