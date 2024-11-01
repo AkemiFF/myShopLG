@@ -1,179 +1,151 @@
 'use client'
 
-import { useState } from 'react'
-import { Plus, Search, Edit, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from '@/components/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Category, Product } from '@/lib/store'
+import { API_BASE_URL } from '@/utils/api'
+import { fetchCategories } from '@/utils/base'
+import getAccessToken from '@/utils/cookies'
+import { Edit, Plus, Search, Trash2 } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
-// Simulated product data
-const initialProducts = [
-  { id: 1, name: 'T-shirt Premium', category: 'Vêtements', price: 29.99, stock: 100 },
-  { id: 2, name: 'Jean Slim', category: 'Vêtements', price: 59.99, stock: 50 },
-  { id: 3, name: 'Chaussures de sport', category: 'Chaussures', price: 89.99, stock: 30 },
-  { id: 4, name: 'Montre connectée', category: 'Électronique', price: 199.99, stock: 20 },
-  { id: 5, name: 'Sac à dos', category: 'Accessoires', price: 49.99, stock: 40 },
-]
 
 export default function AdminProductsPage() {
-  const [products, setProducts] = useState(initialProducts)
+  const [products, setProducts] = useState<Product[]>([])
   const [searchTerm, setSearchTerm] = useState('')
-  const [categoryFilter, setCategoryFilter] = useState('')
-  const [isAddProductOpen, setIsAddProductOpen] = useState(false)
-  const [newProduct, setNewProduct] = useState({ name: '', category: '', price: '', stock: '' })
+  const [categoryFilter, setCategoryFilter] = useState<Category>()
+  const [categories, setCategories] = useState<Category[]>([]);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const accessToken = await getAccessToken();
 
-  const filteredProducts = products.filter(product => 
+
+      return fetch(`${API_BASE_URL}api/product/list/`,
+        {
+          method: 'GET', // You can change this to 'POST' or another method if necessary
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`, // Include the access token
+          },
+        })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Erreur lors de la récupération des produits');
+          }
+          return response.json();
+        })
+        .then(data => {
+          setProducts(data); console.log(data);
+
+        })
+        .catch((error: any) => {
+          console.error('Erreur:', error);
+        });
+    };
+
+    fetchProducts()
+  }, []);
+
+
+  useEffect(() => {
+    fetchCategories()
+      .then((res: Category[]) => {
+        setCategories(res);
+      })
+      .catch((error) => {
+        console.error('Error fetching categories:', error);
+      });
+  }, []);
+
+  const handleCategoryChange = (value: string) => {
+    const selectedCategory = categories.find(category => String(category.id) === value) || null;
+    setCategoryFilter(selectedCategory as Category | undefined);
+  };
+
+  const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (categoryFilter === '' || product.category === categoryFilter)
+    (categoryFilter?.name === '0' || product.category.name === categoryFilter?.name)
   )
-
-  const handleAddProduct = () => {
-    const productToAdd = {
-      id: products.length + 1,
-      name: newProduct.name,
-      category: newProduct.category,
-      price: parseFloat(newProduct.price),
-      stock: parseInt(newProduct.stock),
-    }
-    setProducts([...products, productToAdd])
-    setNewProduct({ name: '', category: '', price: '', stock: '' })
-    setIsAddProductOpen(false)
-  }
 
   const handleDeleteProduct = (id: number) => {
     setProducts(products.filter(product => product.id !== id))
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Gestion des Produits</h1>
-        <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Ajouter un produit
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Ajouter un nouveau produit</DialogTitle>
-              <DialogDescription>
-                Remplissez les détails du nouveau produit ici. Cliquez sur sauvegarder une fois terminé.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Nom
-                </Label>
-                <Input
-                  id="name"
-                  value={newProduct.name}
-                  onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="category" className="text-right">
-                  Catégorie
-                </Label>
-                <Input
-                  id="category"
-                  value={newProduct.category}
-                  onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="price" className="text-right">
-                  Prix
-                </Label>
-                <Input
-                  id="price"
-                  type="number"
-                  value={newProduct.price}
-                  onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="stock" className="text-right">
-                  Stock
-                </Label>
-                <Input
-                  id="stock"
-                  type="number"
-                  value={newProduct.stock}
-                  onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })}
-                  className="col-span-3"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button onClick={handleAddProduct}>Sauvegarder</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
+    <Card className="w-full max-w-4xl mx-auto">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="text-2xl font-bold">Gestion des Produits</CardTitle>
+        <Link href="/admin/products/add">
+          <Button
+            className="bg-orange-500 hover:bg-orange-600 text-white"
+          >
+            <Plus className="mr-2 h-4 w-4" /> Ajouter un Produit
+          </Button>
+        </Link>
+      </CardHeader>
+      <CardContent>
+        <div className="flex space-x-4 mb-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Rechercher un produit..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+          <Select value={categoryFilter ? String(categoryFilter.id) : "0"} onValueChange={handleCategoryChange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Toutes les catégories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="null">Toutes les catégories</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={String(category.id)}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-      <div className="flex space-x-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher un produit..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-8"
-          />
+
         </div>
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Toutes les catégories" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="">Toutes les catégories</SelectItem>
-            <SelectItem value="Vêtements">Vêtements</SelectItem>
-            <SelectItem value="Chaussures">Chaussures</SelectItem>
-            <SelectItem value="Électronique">Électronique</SelectItem>
-            <SelectItem value="Accessoires">Accessoires</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Nom</TableHead>
-            <TableHead>Catégorie</TableHead>
-            <TableHead>Prix</TableHead>
-            <TableHead>Stock</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredProducts.map((product) => (
-            <TableRow key={product.id}>
-              <TableCell>{product.name}</TableCell>
-              <TableCell>{product.category}</TableCell>
-              <TableCell>{product.price.toFixed(2)} €</TableCell>
-              <TableCell>{product.stock}</TableCell>
-              <TableCell>
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="icon">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nom</TableHead>
+              <TableHead>Catégorie</TableHead>
+              <TableHead>Prix</TableHead>
+              <TableHead>Stock</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredProducts.map((product) => (
+              <TableRow key={product.id}>
+                <TableCell>{product.name}</TableCell>
+                <TableCell>{product.category.name}</TableCell>
+                <TableCell>$ {product.price}</TableCell>
+                <TableCell>{product.stock}</TableCell>
+                <TableCell className="text-right">
+                  <Button variant="ghost" size="icon">
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="icon" onClick={() => handleDeleteProduct(product.id)}>
+                  <Button variant="ghost" size="icon" onClick={() => handleDeleteProduct(product.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+
+    </Card>
   )
 }
