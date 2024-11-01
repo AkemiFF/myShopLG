@@ -1,5 +1,6 @@
 import { AdminLayoutProvider } from '@/context/AdminLayoutContext';
 import { StoreSettingsProvider } from '@/context/StoreSettingsContext';
+import { UserProvider } from '@/context/UserContext';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ToastContainer } from 'react-toastify';
@@ -22,14 +23,16 @@ export default function RootLayout({
   return (
     <StoreSettingsProvider>
       <AdminLayoutProvider>
-        <html lang="fr">
-          <body className={inter.className}>
-            <main className="min-h-screen">
-              {children}
-            </main>
-            <ToastContainer />
-          </body>
-        </html>
+        <UserProvider>
+          <html lang="fr">
+            <body className={inter.className}>
+              <main className="min-h-screen">
+                {children}
+              </main>
+              <ToastContainer />
+            </body>
+          </html>
+        </UserProvider>
       </AdminLayoutProvider>
     </StoreSettingsProvider>
   );
