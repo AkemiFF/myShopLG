@@ -1,18 +1,18 @@
 "use client"
-import { useUser } from "@/context/UserContext";
+import { Button } from "@/components/ui/button";
+import { API_BASE_URL } from "@/utils/api";
 
 const Profile = () => {
-    const { user, setUser } = useUser();
-
-    if (!user) {
-        return <p>Utilisateur non connecté</p>;
+    const testSession = () => {
+        fetch(`${API_BASE_URL}api/cart/session/`, {
+            method: 'POST',
+            credentials: "include",
+        })
     }
-
     return (
         <div>
-            <h1>Bonjour, {user.name}!</h1>
-            <p>Email: {user.email}</p>
-            <button onClick={() => setUser(null)}>Se déconnecter</button>
+
+            <Button onClick={testSession} variant='secondary' >Test session</Button>
         </div>
     );
 };
