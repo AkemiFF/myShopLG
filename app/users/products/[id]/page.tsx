@@ -1,8 +1,10 @@
 "use client"
 import ProductReviews from "@/components/Card/ReviewCard"
+import LoginOrGuestDialog from "@/components/LoginOrGuestDialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useUser } from "@/context/UserContext"
 import { Product } from '@/lib/store'
 import { API_BASE_URL } from '@/utils/api'
 import { addToCart } from "@/utils/base"
@@ -13,6 +15,16 @@ import { useEffect, useState } from 'react'
 export default function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState<Product>();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const { user } = useUser();
+  const handleAddToCart = async (productId: number) => {
+    if (!user) {
+      setIsOpen(true);
+    } else {
+      addToCart(productId);
+    }
+  }
   const fetchProduct = (id: any) => {
     fetch(`${API_BASE_URL}api/product/${id}`)
       .then(response => response.json())
@@ -103,7 +115,8 @@ export default function ProductDetail() {
               {product?.description}
             </p>
             <div className="space-y-2">
-              <Button className="w-full" onClick={() => { addToCart(product?.id) }}>Ajouter au panier</Button>
+              <Button className="w-full" onClick={() => { handleAddToCart(product?.id || 0) }}>Ajouter au panier</Button>
+              <LoginOrGuestDialog productId={product?.id || 0} quantity={1} isopen={isOpen} />
               <Button variant="secondary" className="w-full">Acheter maintenant</Button>
             </div>
             <div className="flex justify-between text-sm text-gray-500">
