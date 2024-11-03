@@ -4,18 +4,58 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useUser } from "@/context/UserContext"
+import { API_BASE_URL } from "@/utils/api"
+import getAccessToken, { removeTokens } from "@/utils/cookies"
 import { Edit2 } from 'lucide-react'
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+
+
+interface Item {
+  "product": number,
+  "quantity": number,
+  "price": string
+}
+interface Order {
+  "id": number
+  "items": Item[],
+  "created_at": string,
+  "updated_at": string,
+  "total_price": string,
+  "status": string,
+  "user": number
+}
 
 export default function UserProfilePage() {
   const { user, setUser } = useUser();
-  console.log(user);
+  const router = useRouter();
+  const [orders, setOrders] = useState<Order[]>([]);
 
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const token = await getAccessToken();
+      fetch(`${API_BASE_URL}api/order/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }).then(response => response.json())
+        .then(data => {
+          setOrders(data);
+        });
+    }
+    fetchOrders();
+  }, []);
 
-  const orders = [
-    { id: "123-4567890-1234567", date: "27 octobre 2023", total: 125.97, status: "Livré" },
-    { id: "123-4567890-7654321", date: "15 octobre 2023", total: 79.99, status: "En cours de livraison" },
-    { id: "123-4567890-2468101", date: "5 octobre 2023", total: 49.99, status: "Livré" },
-  ]
+  const handleLogOut = () => {
+    setUser(null);
+    removeTokens();
+    setTimeout(() => {
+      router.push("/users");
+    }, 2000);
+  }
+
 
   const addresses = [
     { id: 1, name: "Domicile", address: "123 Rue Principale, 75000 Paris, France" },
@@ -29,14 +69,11 @@ export default function UserProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-
-
       <main className="container mx-auto py-8">
         <div className="flex items-center space-x-4 mb-8">
           <Avatar className="h-20 w-20">
             <AvatarImage src="/placeholder.svg?height=100&width=100" alt={user?.username} />
             <AvatarFallback>{user?.username?.split(' ').map((n) => n[0]).join('')}</AvatarFallback>
-
           </Avatar>
           <div>
             <h1 className="text-3xl font-bold">{user?.username}</h1>
@@ -62,10 +99,10 @@ export default function UserProfilePage() {
                   <div key={order.id} className="flex items-center justify-between py-4 border-b last:border-b-0">
                     <div>
                       <p className="font-semibold">Commande #{order.id}</p>
-                      <p className="text-sm text-gray-600">{order.date}</p>
+                      <p className="text-sm text-gray-600">{order.created_at}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold">{order.total.toFixed(2)} €</p>
+                      <p className="font-semibold">{order.total_price} €</p>
                       <p className="text-sm text-gray-600">{order.status}</p>
                     </div>
                   </div>
@@ -154,6 +191,10 @@ export default function UserProfilePage() {
                   <div className="flex items-center justify-between">
                     <span>Paramètres de sécurité</span>
                     <Button variant="outline" size="sm">Gérer</Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Se deconncter du compte</span>
+                    <Button variant="default" onClick={handleLogOut} size="sm">Déconnexion</Button>
                   </div>
                   <div className="flex items-center justify-between">
                     <span>Supprimer le compte</span>
