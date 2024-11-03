@@ -20,9 +20,9 @@ export default function Footer() {
           <div className="w-full md:w-1/4 mb-6 md:mb-0">
             <h3 className="text-lg font-semibold mb-2">Informations légales</h3>
             <ul className="text-gray-600">
-              <li><Link href="/help/cgu">CGU</Link></li>
-              <li><Link href="/help/faq">FAQ</Link></li>
-              <li><Link href="/help/contact">Contactez-nous</Link></li>
+              <li><Link href="/users/help/cgu">CGU</Link></li>
+              <li><Link href="/users/help/faq">FAQ</Link></li>
+              <li><Link href="/users/help/contact">Contactez-nous</Link></li>
             </ul>
           </div>
           <div className="w-full md:w-1/4">

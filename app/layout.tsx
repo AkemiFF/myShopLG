@@ -1,30 +1,39 @@
-import Footer from '@/components/Footer'
-import Header from '@/components/Header'
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-const inter = Inter({ subsets: ['latin'] })
+import { AdminLayoutProvider } from '@/context/AdminLayoutContext';
+import { StoreSettingsProvider } from '@/context/StoreSettingsContext';
+import { UserProvider } from '@/context/UserContext';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; // Assurez-vous d'importer les styles
+import './globals.css';
+
+const inter = Inter({ subsets: ['latin'] });
+
 export const metadata: Metadata = {
   title: 'ShopLG',
   description: 'Des saveurs locales, un monde à portée de main.',
-}
+  icons: "/png/favicon.png",
+};
 
 export default function RootLayout({
-
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-
   return (
-    <html lang="fr">
-      <body className={inter.className}>
-        <Header />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
-      </body>
-    </html>
-  )
+    <StoreSettingsProvider>
+      <AdminLayoutProvider>
+        <UserProvider>
+          <html lang="fr">
+            <body className={inter.className}>
+              <main className="min-h-screen">
+                {children}
+              </main>
+              <ToastContainer />
+            </body>
+          </html>
+        </UserProvider>
+      </AdminLayoutProvider>
+    </StoreSettingsProvider>
+  );
 }

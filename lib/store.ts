@@ -7,7 +7,44 @@ interface CartItem {
   price: number
   quantity: number
 }
-
+interface ProductImage {
+  image: string;
+}
+export interface Review {
+  created_at: string;
+  username: string;
+  id: string;
+  rating: number;
+  title: string;
+  author: string;
+  date: string;
+  content: string;
+  helpful: number;
+}
+// Interface principale pour Product
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: string;
+  stock: number;
+  weight: string;
+  length: string;
+  width: string;
+  height: string;
+  sku: string;
+  average_rating: number;
+  review_count: number;
+  category: Category;
+  images: ProductImage[];
+  reviews: Review[];
+}
+export interface Category {
+  id: string;
+  name: string;
+  fr_name: string;
+  description?: string;
+}
 interface User {
   id: number
   name: string

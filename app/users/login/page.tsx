@@ -1,20 +1,63 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { useUser } from '@/context/UserContext'
+import { API_BASE_URL } from '@/utils/api'
+import { setTokens } from '@/utils/cookies'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { toast } from 'react-toastify'
 
 export default function LoginPage() {
+  const layoutContext = useUser();
+  if (!layoutContext) {
+    return <div>Loading...</div>;
+  }
+
+  const { user, setUser } = layoutContext;
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const router = useRouter();
+  const loginUser = async (email: any, password: any) => {
+    const response = await fetch(`${API_BASE_URL}api/login/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
+    });
 
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Login successful:', data);
+      setTokens(data.access, data.refresh);
+      setUser(data.user);
+
+      toast.success('Connéxion réussi', {
+        theme: "colored",
+        autoClose: 3000,
+      });
+      setTimeout(() => {
+        router.push('/users');
+      }, 1000);
+      return data;
+    } else {
+      const errorData = await response.json();
+      console.error('Login failed:', errorData);
+      throw new Error(errorData.error || 'Login failed');
+    }
+  };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically handle the login logic
-    console.log('Login attempt with:', { email, password })
+    loginUser(email, password)
+
   }
 
   return (
@@ -57,7 +100,7 @@ export default function LoginPage() {
             </div>
             <div className="text-center text-sm">
               Vous n'avez pas de compte ?{' '}
-              <Link href="/register" className="text-blue-600 hover:underline">
+              <Link href="/users/register" className="text-blue-600 hover:underline">
                 S'inscrire
               </Link>
             </div>

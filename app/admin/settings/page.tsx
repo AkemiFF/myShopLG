@@ -1,21 +1,27 @@
 'use client'
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useStoreSettings } from '@/context/StoreSettingsContext'
+import { AlertCircle, CheckCircle2 } from 'lucide-react'
 import { useState } from 'react'
 
 export default function AdminSettingsPage() {
-  const [storeSettings, setStoreSettings] = useState({
-    name: 'Mon E-commerce',
-    email: 'contact@monecommerce.com',
-    address: '123 Rue du Commerce, 75001 Paris',
-    allowGuestCheckout: true,
-    enableReviews: true,
-    enableWishlist: true,
+  const { storeSettings, setStoreSettings } = useStoreSettings();
+
+  const [settings, setSettings] = useState({
+    name: storeSettings.name,
+    email: storeSettings.email,
+    address: storeSettings.address,
+    allowGuestCheckout: storeSettings.allowGuestCheckout,
+    enableReviews: storeSettings.enableReviews,
+    enableWishlist: storeSettings.enableWishlist,
   })
 
   const [adminPassword, setAdminPassword] = useState({
@@ -24,153 +30,192 @@ export default function AdminSettingsPage() {
     confirm: '',
   })
 
-  const handleStoreSettingsChange = (e:any) => {
+  const [successMessage, setSuccessMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const handlesettingsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setStoreSettings(prev => ({ ...prev, [name]: value }))
+    setSettings(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleToggleChange = (name: string) => {
-    setStoreSettings(prev => ({ ...prev, [name]: !prev[name]}));
-  };
+  const handleToggleChange = (name: keyof typeof settings) => {
+    setSettings(prev => ({ ...prev, [name]: !prev[name] }))
+  }
 
-  const handlePasswordChange = (e:any) => {
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setAdminPassword(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleStoreSettingsSubmit = (e:any) => {
-    e.preventDefault()
-    // Here you would typically send the updated settings to your backend
-    console.log('Updated store settings:', storeSettings)
+  const handlesettingsSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setStoreSettings(settings);
+    setSuccessMessage('Paramètres du magasin mis à jour avec succès')
+    setTimeout(() => setSuccessMessage(''), 3000)
   }
 
-  const handlePasswordSubmit = (e:any) => {
+  const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Here you would typically send the new password to your backend
+    if (adminPassword.new !== adminPassword.confirm) {
+      setErrorMessage('Les nouveaux mots de passe ne correspondent pas')
+      setTimeout(() => setErrorMessage(''), 3000)
+      return
+    }
     console.log('Password change request:', adminPassword)
+    setSuccessMessage('Mot de passe mis à jour avec succès')
+    setTimeout(() => setSuccessMessage(''), 3000)
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Paramètres</h1>
+    <div className="max-w-4xl mx-auto p-6 space-y-6 bg-[#EAEDED]">
+      <h1 className="text-3xl font-bold text-[#232F3E]">Paramètres</h1>
 
-      <Tabs defaultValue="store">
-        <TabsList>
-          <TabsTrigger value="store">Paramètres du magasin</TabsTrigger>
-          <TabsTrigger value="account">Compte administrateur</TabsTrigger>
+      {successMessage && (
+        <Alert variant="default" className="bg-[#EAF6EC] border-[#067D68] text-[#067D68]">
+          <CheckCircle2 className="h-4 w-4" />
+          <AlertTitle>Succès</AlertTitle>
+          <AlertDescription>{successMessage}</AlertDescription>
+        </Alert>
+      )}
+
+      {errorMessage && (
+        <Alert variant="destructive" className="bg-[#FFF5F5] border-[#D13212] text-[#D13212]">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Erreur</AlertTitle>
+          <AlertDescription>{errorMessage}</AlertDescription>
+        </Alert>
+      )}
+
+      <Tabs defaultValue="store" className="space-y-4">
+        <TabsList className="bg-[#232F3E] text-white">
+          <TabsTrigger value="store" className="data-[state=active]:bg-[#FF9900] data-[state=active]:text-[#232F3E]">Paramètres du magasin</TabsTrigger>
+          <TabsTrigger value="account" className="data-[state=active]:bg-[#FF9900] data-[state=active]:text-[#232F3E]">Compte administrateur</TabsTrigger>
         </TabsList>
         <TabsContent value="store">
-          <Card>
-            <form onSubmit={handleStoreSettingsSubmit}>
+          <Card className="bg-white shadow-sm">
+            <form onSubmit={handlesettingsSubmit}>
               <CardHeader>
-                <CardTitle>Paramètres du magasin</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-2xl text-[#232F3E]">Paramètres du magasin</CardTitle>
+                <CardDescription className="text-[#545B64]">
                   Gérez les informations et les paramètres de votre boutique en ligne.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="storeName">Nom du magasin</Label>
+                  <Label htmlFor="storeName" className="text-[#232F3E]">Nom du magasin</Label>
                   <Input
                     id="storeName"
                     name="name"
-                    value={storeSettings.name}
-                    onChange={handleStoreSettingsChange}
+                    value={settings.name}
+                    onChange={handlesettingsChange}
+                    className="border-[#D5D9D9] focus:border-[#FF9900] focus:ring-[#FF9900]"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="storeEmail">Email de contact</Label>
+                  <Label htmlFor="storeEmail" className="text-[#232F3E]">Email de contact</Label>
                   <Input
                     id="storeEmail"
                     name="email"
                     type="email"
-                    value={storeSettings.email}
-                    onChange={handleStoreSettingsChange}
+                    value={settings.email}
+                    onChange={handlesettingsChange}
+                    className="border-[#D5D9D9] focus:border-[#FF9900] focus:ring-[#FF9900]"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="storeAddress">Adresse</Label>
+                  <Label htmlFor="storeAddress" className="text-[#232F3E]">Adresse</Label>
                   <Input
                     id="storeAddress"
                     name="address"
-                    value={storeSettings.address}
-                    onChange={handleStoreSettingsChange}
+                    value={settings.address}
+                    onChange={handlesettingsChange}
+                    className="border-[#D5D9D9] focus:border-[#FF9900] focus:ring-[#FF9900]"
                   />
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="allowGuestCheckout"
-                    checked={storeSettings.allowGuestCheckout}
-                    onCheckedChange={() => handleToggleChange('allowGuestCheckout')}
-                  />
-                  <Label htmlFor="allowGuestCheckout">Autoriser les achats sans compte</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="enableReviews"
-                    checked={storeSettings.enableReviews}
-                    onCheckedChange={() => handleToggleChange('enableReviews')}
-                  />
-                  <Label htmlFor="enableReviews">Activer les avis produits</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="enableWishlist"
-                    checked={storeSettings.enableWishlist}
-                    onCheckedChange={() => handleToggleChange('enableWishlist')}
-                  />
-                  <Label htmlFor="enableWishlist">Activer la liste de souhaits</Label>
+                <Separator className="my-4" />
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="allowGuestCheckout" className="text-[#232F3E]">Autoriser les achats sans compte</Label>
+                    <Switch
+                      id="allowGuestCheckout"
+                      checked={settings.allowGuestCheckout}
+                      onCheckedChange={() => handleToggleChange('allowGuestCheckout')}
+                      className="data-[state=checked]:bg-[#FF9900]"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="enableReviews" className="text-[#232F3E]">Activer les avis produits</Label>
+                    <Switch
+                      id="enableReviews"
+                      checked={settings.enableReviews}
+                      onCheckedChange={() => handleToggleChange('enableReviews')}
+                      className="data-[state=checked]:bg-[#FF9900]"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="enableWishlist" className="text-[#232F3E]">Activer la liste de souhaits</Label>
+                    <Switch
+                      id="enableWishlist"
+                      checked={settings.enableWishlist}
+                      onCheckedChange={() => handleToggleChange('enableWishlist')}
+                      className="data-[state=checked]:bg-[#FF9900]"
+                    />
+                  </div>
                 </div>
               </CardContent>
               <CardFooter>
-                <Button type="submit">Enregistrer les modifications</Button>
+                <Button type="submit" className="bg-[#FF9900] hover:bg-[#FFAC31] text-[#232F3E] font-bold">Enregistrer les modifications</Button>
               </CardFooter>
             </form>
           </Card>
         </TabsContent>
         <TabsContent value="account">
-          <Card>
+          <Card className="bg-white shadow-sm">
             <form onSubmit={handlePasswordSubmit}>
               <CardHeader>
-                <CardTitle>Changer le mot de passe</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-2xl text-[#232F3E]">Changer le mot de passe</CardTitle>
+                <CardDescription className="text-[#545B64]">
                   Mettez à jour le mot de passe de votre compte administrateur.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="currentPassword">Mot de passe actuel</Label>
+                  <Label htmlFor="currentPassword" className="text-[#232F3E]">Mot de passe actuel</Label>
                   <Input
                     id="currentPassword"
                     name="current"
                     type="password"
                     value={adminPassword.current}
                     onChange={handlePasswordChange}
+                    className="border-[#D5D9D9] focus:border-[#FF9900] focus:ring-[#FF9900]"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword">Nouveau mot de passe</Label>
+                  <Label htmlFor="newPassword" className="text-[#232F3E]">Nouveau mot de passe</Label>
                   <Input
                     id="newPassword"
                     name="new"
                     type="password"
                     value={adminPassword.new}
                     onChange={handlePasswordChange}
+                    className="border-[#D5D9D9] focus:border-[#FF9900] focus:ring-[#FF9900]"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirmer le nouveau mot de passe</Label>
+                  <Label htmlFor="confirmPassword" className="text-[#232F3E]">Confirmer le nouveau mot de passe</Label>
                   <Input
                     id="confirmPassword"
                     name="confirm"
                     type="password"
                     value={adminPassword.confirm}
                     onChange={handlePasswordChange}
+                    className="border-[#D5D9D9] focus:border-[#FF9900] focus:ring-[#FF9900]"
                   />
                 </div>
               </CardContent>
               <CardFooter>
-                <Button type="submit">Changer le mot de passe</Button>
+                <Button type="submit" className="bg-[#FF9900] hover:bg-[#FFAC31] text-[#232F3E] font-bold">Changer le mot de passe</Button>
               </CardFooter>
             </form>
           </Card>
