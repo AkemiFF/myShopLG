@@ -2,6 +2,7 @@ import { toast } from "react-toastify";
 import { API_BASE_URL } from "./api";
 import getAccessToken from "./cookies";
 // utils/api.js (ou dans un fichier de composant)
+
 export const fetchCategories = async () => {
     try {
         const response = await fetch(`${API_BASE_URL}api/product/categories/`);
@@ -16,6 +17,30 @@ export const fetchCategories = async () => {
     } catch (error) {
         console.error('Erreur:', error);
         return [];
+    }
+};
+
+export const fetchClientInfo = async () => {
+    try {
+        const access = await getAccessToken();
+        const response = await fetch(`${API_BASE_URL}api/client/info/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${access}`, // Inclure le token d'accès dans les en-têtes
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        return data;
+    } catch (error) {
+        console.error('Erreur lors de la récupération des informations du client:', error);
+        return null;
     }
 };
 

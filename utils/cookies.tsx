@@ -60,7 +60,7 @@ const getAccessToken = async () => {
                 });
             }
         } catch (error) {
-            console.error('Error refreshing access token:', error);
+            // console.error('Error refreshing access token:', error);
             return null;
         }
     }
