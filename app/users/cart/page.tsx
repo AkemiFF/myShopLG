@@ -25,32 +25,36 @@ export default function CartPage() {
   const subtotal = cartItems.reduce((acc, item) => acc + item.total_price, 0)
   const shipping = 5.99
   const total = subtotal + shipping
+  const [noCart, setNoCart] = useState(false);
   const { user } = useUser();
 
-  const fetchCartItems = () => {
-    if (user) {
-      getAccessToken()
-        .then(access => {
-          fetch(`${API_BASE_URL}api/cart/`, {
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${access}`,
-            }
-          }).then(res => res.json()).then(data => {
-            setCartItems(data.items)
-          })
-        })
-    } else {
-      fetch(`${API_BASE_URL}api/cart/`, {
+  const fetchCartItems = async () => {
+    const access = await getAccessToken();
+
+    try {
+      const response = await fetch(`${API_BASE_URL}api/cart/`, {
         headers: {
           "Content-Type": "application/json",
+          ...(access ? { "Authorization": `Bearer ${access}` } : {}),
         },
-        credentials: 'include',
-      }).then(res => res.json()).then(data => {
-        setCartItems(data.items)
-      })
+        credentials: !access ? 'include' : undefined,
+      });
+
+      if (response.status === 404) {
+        setCartItems([]);
+        console.log("Votre panier est vide");
+        setNoCart(true);
+      } else if (!response.ok) {
+        throw new Error("Erreur lors de la récupération des articles du panier");
+      } else {
+        const data = await response.json();
+        setCartItems(data.items);
+      }
+    } catch (error) {
+      // console.error("Erreur:", error);
     }
-  }
+  };
+
 
   const handleRemoveItem = async (productId: number) => {
     try {
@@ -215,7 +219,11 @@ export default function CartPage() {
           </div>
 
           <div>
-            <Card>
+            {noCart ? (
+              <>
+                Votre panier est vide
+              </>
+            ) : (<><Card>
               <CardHeader>
                 <CardTitle>Résumé de la commande</CardTitle>
               </CardHeader>
@@ -234,38 +242,39 @@ export default function CartPage() {
                     <span>{total.toFixed(2)} €</span>
                   </div>
                 </div>
-                <a href="/users/products/checkout">
+                <a href="/users/cart/checkout">
                   <Button className="w-full mt-4">Procéder au paiement</Button>
                 </a>
               </CardContent>
-            </Card>
+            </Card><Card className="mt-4">
+                <CardHeader>
+                  <CardTitle>Options de livraison</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choisir une option de livraison" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="standard">
+                        <div className="flex items-center">
+                          <Truck className="mr-2 h-4 w-4" />
+                          <span>Livraison standard (3-5 jours)</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="express">
+                        <div className="flex items-center">
+                          <Truck className="mr-2 h-4 w-4" />
+                          <span>Livraison express (1-2 jours)</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </CardContent>
+              </Card>
+            </>
+            )}
 
-            <Card className="mt-4">
-              <CardHeader>
-                <CardTitle>Options de livraison</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choisir une option de livraison" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="standard">
-                      <div className="flex items-center">
-                        <Truck className="mr-2 h-4 w-4" />
-                        <span>Livraison standard (3-5 jours)</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="express">
-                      <div className="flex items-center">
-                        <Truck className="mr-2 h-4 w-4" />
-                        <span>Livraison express (1-2 jours)</span>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </CardContent>
-            </Card>
           </div>
         </div>
 

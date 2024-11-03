@@ -28,6 +28,7 @@ export default function LoginPage() {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({
         email: email,
         password: password,
@@ -36,7 +37,7 @@ export default function LoginPage() {
 
     if (response.ok) {
       const data = await response.json();
-      console.log('Login successful:', data);
+
       setTokens(data.access, data.refresh);
       setUser(data.user);
 
