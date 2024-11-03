@@ -2,29 +2,49 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from "@/components/ui/input";
+import { useSearch } from '@/context/SearchContext';
 import { useUser } from '@/context/UserContext';
+import { API_BASE_URL } from '@/utils/api';
 import { LogIn, Search, ShoppingCart, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function Header() {
   const [searchValue, setSearchValue] = useState("");
   const { user } = useUser();
-
+  const { search, setSearch } = useSearch();
+  const router = useRouter();
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Implement search functionality here
-    console.log('Searching for:', searchValue);
+    fetchSearch(searchValue);
+    const onSearchUrl = window.location.href.endsWith("/products/search");
+    if (!onSearchUrl) {
+      router.push("/users/products/search")
+    }
   };
+
+  const fetchSearch = (searchValue: string) => {
+
+    fetch(`${API_BASE_URL}api/product/search/?q=${searchValue}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    }).then((response) => response.json())
+      .then((data) => {
+        setSearch(data);
+      });
+  }
 
   return (
     <header className="bg-gray-900 text-white py-4 px-4 sm:px-6 lg:px-8 shadow-lg">
       <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
         <div className="flex items-center space-x-4">
           <Link href="/users" className="flex items-center space-x-2">
+            {/* <Image src="/png/logo1.png" priority width={80} height={80} alt="ShopLG" className="w-auto h-12 sm:h-16" /> */}
             <Image src="/png/logo1.png" width={80} height={80} alt="ShopLG" className="w-auto h-12 sm:h-16" />
-
           </Link>
         </div>
         <form onSubmit={handleSearch} className="flex-1 max-w-2xl w-full">
@@ -68,11 +88,11 @@ export default function Header() {
                   <span className="hidden sm:inline">Login</span>
                 </Button>
               </Link>
-              <Link href="/users/register" passHref>
+              {/* <Link href="/users/register" passHref>
                 <Button variant="link" className=" text-white hover:bg-blue-700 transition-colors duration-200">
                   <span className="hidden sm:inline">Sign Up</span>
                 </Button>
-              </Link>
+              </Link> */}
             </div>
           )}
           {/* </div> */}
