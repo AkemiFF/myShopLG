@@ -34,37 +34,6 @@ export default function ProductDetail() {
     fetchProduct(id);
   }, [id]);
 
-
-
-  const reviews = [
-    {
-      id: 1,
-      title: "Great product, highly recommend!",
-      rating: 5,
-      author: "John D.",
-      date: "Reviewed in the United States on July 10, 2023",
-      content: "This product exceeded my expectations. The quality is outstanding and it arrived earlier than expected. I've been using it for a week now and I'm very satisfied with my purchase.",
-      helpful: 42,
-    },
-    {
-      id: 2,
-      title: "Good value for money",
-      rating: 4,
-      author: "Sarah M.",
-      date: "Reviewed in the United Kingdom on June 28, 2023",
-      content: "Overall, I'm happy with this product. It does what it's supposed to do and the price is reasonable. The only reason I'm not giving it 5 stars is because the instructions could be clearer.",
-      helpful: 18,
-    },
-    {
-      id: 3,
-      title: "Decent, but room for improvement",
-      rating: 3,
-      author: "Alex W.",
-      date: "Reviewed in Canada on July 5, 2023",
-      content: "The product is okay, but I feel like there's room for improvement. It works as advertised, but the build quality could be better. I'm hoping future versions will address these issues.",
-      helpful: 7,
-    },
-  ]
   return (
     <div className="min-h-screen bg-gray-100">
 
@@ -75,7 +44,7 @@ export default function ProductDetail() {
             <div className="bg-white p-4 rounded-lg shadow">
               {product?.images[0] ?
                 <img
-                  src={`${product.images[0].image}?height=600&width=400`}
+                  src={`${API_BASE_URL + product.images[0].image}?height=600&width=400`}
                   alt={`Product ${product.id}`}
                   className="w-full h-auto" />
                 :
