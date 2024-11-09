@@ -35,25 +35,29 @@ export default function SearchPage() {
     };
 
     useEffect(() => {
+        fetchCat();
         return setProducts(search || mainData)
     }, [search, setSearch]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const fetchedCategories = await fetchCategories()
-            setCategories(fetchedCategories)
-
-            try {
-                const response = await fetch(`${API_BASE_URL}api/product/`)
-                const data = await response.json()
-                setProducts(data);
-                setMainData(data);
-            } catch (error) {
-                console.error("Erreur lors de la récupération des produits :", error)
-            }
+    const fetchCat = async () => {
+        const fetchedCategories = await fetchCategories()
+        setCategories(fetchedCategories)
+    }
+    const fetchData = async () => {
+        await fetchCat();
+        try {
+            const response = await fetch(`${API_BASE_URL}api/product/`)
+            const data = await response.json()
+            setProducts(data);
+            setMainData(data);
+        } catch (error) {
+            console.error("Erreur lors de la récupération des produits :", error)
         }
+    }
+    useEffect(() => {
+
         if (!search || search.length === 0) {
-            fetchData()
+            fetchData();
         }
 
     }, [])
@@ -87,6 +91,7 @@ export default function SearchPage() {
     )
 
     const clearFilter = () => {
+        fetchData();
         setSearchTerm("");
         setSelectedCategory("All");
         setPriceRange([0, 1000]);

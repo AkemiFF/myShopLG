@@ -1,4 +1,5 @@
 "use client"
+import ProductCard from "@/components/Card/ProductCard"
 import ProductReviews from "@/components/Card/ReviewCard"
 import LoginOrGuestDialog from "@/components/LoginOrGuestDialog"
 import { Button } from "@/components/ui/button"
@@ -8,16 +9,37 @@ import { useUser } from "@/context/UserContext"
 import { Product } from '@/lib/store'
 import { API_BASE_URL } from '@/utils/api'
 import { addToCart } from "@/utils/base"
-import { Heart, Share2, Star } from 'lucide-react'
+import { Share2, Star } from 'lucide-react'
 import { useParams } from "next/navigation"
 import { useEffect, useState } from 'react'
+import { toast } from "react-toastify"
 
 export default function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState<Product>();
+  const [similarProduct, setSimilarProduct] = useState<Product[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
   const { user } = useUser();
+
+  const currentUrl = window.location.href;
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(currentUrl);
+      toast.info('Lien copié dans le presse-papiers !',
+        {
+          autoClose: 800,
+          theme: "colored",
+        }
+
+      );
+
+
+    } catch (err) {
+      console.error('Échec de la copie :', err);
+    }
+  }
+
   const handleAddToCart = async (productId: number) => {
     if (!user) {
       setIsOpen(true);
@@ -28,7 +50,10 @@ export default function ProductDetail() {
   const fetchProduct = (id: any) => {
     fetch(`${API_BASE_URL}api/product/${id}`)
       .then(response => response.json())
-      .then(data => setProduct(data));
+      .then(data => {
+        setProduct(data.product);
+        setSimilarProduct(data.similar_products);
+      });
   }
   useEffect(() => {
     fetchProduct(id);
@@ -88,12 +113,12 @@ export default function ProductDetail() {
               <LoginOrGuestDialog productId={product?.id || 0} quantity={1} isopen={isOpen} />
               <Button variant="secondary" className="w-full">Acheter maintenant</Button>
             </div>
-            <div className="flex justify-between text-sm text-gray-500">
-              <Button variant="ghost" size="sm">
+            <div className="flex justify-end text-sm text-gray-500">
+              {/* <Button variant="ghost" size="sm">
                 <Heart className="mr-2 h-4 w-4" />
                 Ajouter à la liste d'envies
-              </Button>
-              <Button variant="ghost" size="sm">
+              </Button> */}
+              <Button onClick={handleShare} variant="ghost" size="sm">
                 <Share2 className="mr-2 h-4 w-4" />
                 Partager
               </Button>
@@ -129,7 +154,7 @@ export default function ProductDetail() {
             </Card>
           </TabsContent>
           <TabsContent value="reviews" className="mt-4">
-            <ProductReviews reviews={product?.reviews || []} />
+            <ProductReviews reviews={product?.reviews || []} id={product?.id || 0} />
           </TabsContent>
         </Tabs>
 
@@ -137,20 +162,8 @@ export default function ProductDetail() {
         <div className="mt-12">
           <h2 className="text-2xl font-bold mb-4">Produits similaires</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((product) => (
-              <Card key={product}>
-                <CardContent className="p-4">
-                  <img src={`/placeholder.svg?height=200&width=200`} alt={`Similar product ${product}`} className="w-full h-auto mb-2" />
-                  <h3 className="font-semibold">Produit Similaire {product}</h3>
-                  <div className="flex items-center space-x-1 mb-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="font-bold">XX,XX €</p>
-                </CardContent>
-
-              </Card>
+            {similarProduct.map((item) => (
+              <ProductCard key={item.id} product={item} />
             ))}
           </div>
         </div>
