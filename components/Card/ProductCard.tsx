@@ -14,8 +14,6 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
 
     const { user } = useUser();
     const handleAddToCart = async (productId: number) => {
-        console.log(productId);
-
         if (!user) {
             setIsOpen(true);
         } else {
@@ -23,7 +21,7 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
         }
     }
     return (
-        <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+        <div key={product.id + 1000} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
             <img
                 src={`${product.images[0] ? API_BASE_URL + product.images[0].image : "/placeholder.svg"}?height=200&width=200&text=Product ${product.id}`}
                 alt={`Product ${product.id}`}
