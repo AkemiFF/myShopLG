@@ -40,10 +40,10 @@ export default function AdminAside() {
                         <Users className="mr-3 h-5 w-5" />
                         Customers
                     </Link>
-                    <Link href="#" className="flex items-center py-2 px-4 rounded-md text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
+                    {/* <Link href="#" className="flex items-center py-2 px-4 rounded-md text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
                         <Percent className="mr-3 h-5 w-5" />
                         Promotions
-                    </Link>
+                    </Link> */}
                     <Link href="/admin/settings" className="flex items-center py-2 px-4 rounded-md text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
                         <Settings className="mr-3 h-5 w-5" />
                         Settings
