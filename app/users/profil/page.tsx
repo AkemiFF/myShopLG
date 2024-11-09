@@ -51,9 +51,7 @@ export default function UserProfilePage() {
   const handleLogOut = () => {
     setUser(null);
     removeTokens();
-    setTimeout(() => {
-      router.push("/users");
-    }, 2000);
+    router.push("/users");
   }
 
 
@@ -76,7 +74,8 @@ export default function UserProfilePage() {
             <AvatarFallback>{user?.username?.split(' ').map((n) => n[0]).join('')}</AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-3xl font-bold">{user?.username}</h1>
+            <h1 className="text-3xl font-bold">{user?.username.replace(/_/g, ' ')
+            }</h1>
             <p className="text-gray-600">{user?.email}</p>
           </div>
         </div>
