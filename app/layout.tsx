@@ -26,6 +26,7 @@ export default function RootLayout({
       <AdminLayoutProvider>
         <UserProvider>
           <SearchProvider>
+
             <html lang="fr">
               <body className={inter.className}>
                 {/* <main className="min-h-screen"> */}
