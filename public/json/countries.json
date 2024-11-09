@@ -1,0 +1,102 @@
+[
+    {
+        "code": "FR",
+        "name": "France"
+    },
+    {
+        "code": "BE",
+        "name": "Belgique"
+    },
+    {
+        "code": "CH",
+        "name": "Suisse"
+    },
+    {
+        "code": "DE",
+        "name": "Allemagne"
+    },
+    {
+        "code": "IT",
+        "name": "Italie"
+    },
+    {
+        "code": "ES",
+        "name": "Espagne"
+    },
+    {
+        "code": "GB",
+        "name": "Royaume-Uni"
+    },
+    {
+        "code": "US",
+        "name": "États-Unis"
+    },
+    {
+        "code": "CA",
+        "name": "Canada"
+    },
+    {
+        "code": "JP",
+        "name": "Japon"
+    },
+    {
+        "code": "CN",
+        "name": "Chine"
+    },
+    {
+        "code": "AU",
+        "name": "Australie"
+    },
+    {
+        "code": "BR",
+        "name": "Brésil"
+    },
+    {
+        "code": "IN",
+        "name": "Inde"
+    },
+    {
+        "code": "NL",
+        "name": "Pays-Bas"
+    },
+    {
+        "code": "SE",
+        "name": "Suède"
+    },
+    {
+        "code": "NO",
+        "name": "Norvège"
+    },
+    {
+        "code": "FI",
+        "name": "Finlande"
+    },
+    {
+        "code": "DK",
+        "name": "Danemark"
+    },
+    {
+        "code": "AT",
+        "name": "Autriche"
+    },
+    {
+        "code": "IE",
+        "name": "Irlande"
+    },
+    {
+        "code": "NZ",
+        "name": "Nouvelle-Zélande"
+    },
+    {
+        "code": "SG",
+        "name": "Singapour"
+    },
+    {
+        "code": "MX",
+        "name": "Mexique"
+    },
+    {
+        "code": "ZA",
+        "name": "Afrique du Sud"
+    }
+]
