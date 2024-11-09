@@ -10,7 +10,7 @@ import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
 
-// Simulated product data
+
 const productData = {
   id: 1,
   name: 'T-shirt Premium',
@@ -25,12 +25,12 @@ export default function AdminProductDetailPage() {
   const { id } = useParams()
   const [product, setProduct] = useState(productData)
 
-  const handleInputChange = (e:any) => {
+  const handleInputChange = (e: any) => {
     const { name, value } = e.target
     setProduct({ ...product, [name]: value })
   }
 
-  const handleSubmit = (e:any) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault()
     // Here you would typically update the product in your backend
     console.log('Updated product:', product)
@@ -99,7 +99,7 @@ export default function AdminProductDetailPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="category">Catégorie</Label>
-                <Select name="category" value={product.category} onValueChange={(value) => handleInputChange({ target: { name: 'category', value } })}>
+                <Select name="category" value={product.category} onValueChange={(value: any) => handleInputChange({ target: { name: 'category', value } })}>
                   <SelectTrigger id="category">
                     <SelectValue placeholder="Sélectionner une catégorie" />
                   </SelectTrigger>

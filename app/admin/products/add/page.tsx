@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Category } from "@/lib/store"
 import { API_BASE_URL } from "@/utils/api"
 import { fetchCategories } from "@/utils/base"
-import getAccessToken from "@/utils/cookies"
+import getAdminAccessToken from "@/utils/cookies"
 import { Plus, Upload } from 'lucide-react'
 import { AwaitedReactNode, JSXElementConstructor, ReactElement, ReactNode, useEffect, useState } from 'react'
 import { toast, ToastContentProps } from "react-toastify"
@@ -143,7 +143,7 @@ export default function Component() {
         });
 
 
-        const access = await getAccessToken();
+        const access = await getAdminAccessToken();
         try {
             const response = await fetch(`${API_BASE_URL}api/product/create/`, {
                 method: 'POST',
@@ -233,7 +233,8 @@ export default function Component() {
         setSpecifications([...specifications, { name: '', value: '' }])
     }
 
-    return (
+
+    return (<div className="container mx-auto px-6 py-8">
         <div className="flex h-screen bg-gray-100">
             {/* Sidebar */}
 
@@ -507,5 +508,6 @@ export default function Component() {
                 </main>
             </div>
         </div>
+    </div>
     )
 }
