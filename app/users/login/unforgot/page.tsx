@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAdminLayoutContext } from '@/context/AdminLayoutContext'
 import { API_BASE_URL } from '@/utils/api'
-import { setTokens } from '@/utils/cookies'
+import { setAdminTokens, setTokens } from '@/utils/cookies'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -47,6 +47,7 @@ export default function LoginPage() {
 
         if (data.is_admin) {
           setTokens(data.token.access, data.token.refresh);
+          setAdminTokens(data.token.access, data.token.refresh);
           setUserInfo(data.user_info);
           toast.success('Connexion réussi', {
             theme: "colored",

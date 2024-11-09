@@ -43,11 +43,10 @@ export default function LoginPage() {
 
       toast.success('Connéxion réussi', {
         theme: "colored",
-        autoClose: 3000,
+        autoClose: 500,
       });
-      setTimeout(() => {
-        router.push('/users');
-      }, 1000);
+      router.push('/users');
+
       return data;
     } else {
       const errorData = await response.json();
