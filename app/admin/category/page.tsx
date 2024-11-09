@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { API_BASE_URL } from "@/utils/api"
 import { toast } from 'react-toastify'
 
+import { getAdminAccessToken } from "@/utils/cookies"
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 
@@ -42,7 +43,7 @@ export default function AdminCategories() {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
     const [currentCategory, setCurrentCategory] = useState<Category | null>(null)
 
-    const handleCreateCategory = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleCreateCategory = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
 
@@ -51,16 +52,16 @@ export default function AdminCategories() {
             fr_name: formData.get('fr_name') as string,
             description: formData.get('description') as string,
         };
-
+        const accessToken = await getAdminAccessToken();
         fetch(`${API_BASE_URL}api/product/category/create/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
             },
             body: JSON.stringify(newCategory),
         })
             .then(async (response) => {
-                console.log(response);
 
                 if (!response.ok) {
                     const errorData = await response.json()
@@ -137,110 +138,111 @@ export default function AdminCategories() {
     }
 
     return (
-        <Card className="w-full max-w-4xl mx-auto">
-            <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-2xl font-bold">Categories</CardTitle>
-                <Button
-                    onClick={() => setIsCreateDialogOpen(true)}
-                    className="bg-orange-500 hover:bg-orange-600 text-white"
-                >
-                    <Plus className="mr-2 h-4 w-4" /> Add Category
-                </Button>
-            </CardHeader>
-            <CardContent>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>French Name</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {categories.map((category) => (
-                            <TableRow key={category.name}>
-                                <TableCell>{category.name}</TableCell>
-                                <TableCell>{category.fr_name}</TableCell>
-                                <TableCell>{category.description}</TableCell>
-                                <TableCell className="text-right">
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => {
-                                            setCurrentCategory(category)
-                                            setIsEditDialogOpen(true)
-                                        }}
-                                    >
-                                        <Pencil className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => handleDeleteCategory(category.id)}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </TableCell>
+        <div className="container mx-auto px-6 py-8">
+            <Card className="w-full max-w-4xl mx-auto">
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle className="text-2xl font-bold">Categories</CardTitle>
+                    <Button
+                        onClick={() => setIsCreateDialogOpen(true)}
+                        className="bg-orange-500 hover:bg-orange-600 text-white"
+                    >
+                        <Plus className="mr-2 h-4 w-4" /> Add Category
+                    </Button>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Name</TableHead>
+                                <TableHead>French Name</TableHead>
+                                <TableHead>Description</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </CardContent>
+                        </TableHeader>
+                        <TableBody>
+                            {categories.map((category) => (
+                                <TableRow key={category.name}>
+                                    <TableCell>{category.name}</TableCell>
+                                    <TableCell>{category.fr_name}</TableCell>
+                                    <TableCell>{category.description}</TableCell>
+                                    <TableCell className="text-right">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => {
+                                                setCurrentCategory(category)
+                                                setIsEditDialogOpen(true)
+                                            }}
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleDeleteCategory(category.id)}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
 
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Create New Category</DialogTitle>
-                    </DialogHeader>
-                    <form onSubmit={handleCreateCategory}>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <label htmlFor="name" className="text-right">Name</label>
-                                <Input id="name" name="name" className="col-span-3" required />
+                <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Create New Category</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={handleCreateCategory}>
+                            <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <label htmlFor="name" className="text-right">Name</label>
+                                    <Input id="name" name="name" className="col-span-3" required />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <label htmlFor="fr_name" className="text-right">French Name</label>
+                                    <Input id="fr_name" name="fr_name" className="col-span-3" required />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <label htmlFor="description" className="text-right">Description</label>
+                                    <Textarea id="description" name="description" className="col-span-3" required />
+                                </div>
                             </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <label htmlFor="fr_name" className="text-right">French Name</label>
-                                <Input id="fr_name" name="fr_name" className="col-span-3" required />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <label htmlFor="description" className="text-right">Description</label>
-                                <Textarea id="description" name="description" className="col-span-3" required />
-                            </div>
-                        </div>
-                        <DialogFooter>
-                            <Button type="submit" className="bg-orange-500 hover:bg-orange-600 text-white">Create Category</Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
+                            <DialogFooter>
+                                <Button type="submit" className="bg-orange-500 hover:bg-orange-600 text-white">Create Category</Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
 
-            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Edit Category</DialogTitle>
-                    </DialogHeader>
-                    <form onSubmit={handleEditCategory}>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <label htmlFor="edit-name" className="text-right">Name</label>
-                                <Input id="edit-name" name="name" defaultValue={currentCategory?.name} className="col-span-3" required />
+                <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Edit Category</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={handleEditCategory}>
+                            <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <label htmlFor="edit-name" className="text-right">Name</label>
+                                    <Input id="edit-name" name="name" defaultValue={currentCategory?.name} className="col-span-3" required />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <label htmlFor="edit-fr_name" className="text-right">French Name</label>
+                                    <Input id="edit-fr_name" name="fr_name" defaultValue={currentCategory?.fr_name} className="col-span-3" required />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <label htmlFor="edit-description" className="text-right">Description</label>
+                                    <Textarea id="edit-description" name="description" defaultValue={currentCategory?.description} className="col-span-3" required />
+                                </div>
                             </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <label htmlFor="edit-fr_name" className="text-right">French Name</label>
-                                <Input id="edit-fr_name" name="fr_name" defaultValue={currentCategory?.fr_name} className="col-span-3" required />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <label htmlFor="edit-description" className="text-right">Description</label>
-                                <Textarea id="edit-description" name="description" defaultValue={currentCategory?.description} className="col-span-3" required />
-                            </div>
-                        </div>
-                        <DialogFooter>
-                            <Button type="submit" className="bg-orange-500 hover:bg-orange-600 text-white">Update Category</Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
-        </Card>
+                            <DialogFooter>
+                                <Button type="submit" className="bg-orange-500 hover:bg-orange-600 text-white">Update Category</Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
+            </Card></div>
     )
 }
