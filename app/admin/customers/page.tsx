@@ -40,20 +40,9 @@ interface Client {
   "orders_count": number,
   "recent_orders": RecentOrder[]
 }
-const initialCustomers = [
-  { id: 1, name: 'Jean Dupont', email: 'jean.dupont@example.com', registrationDate: '2023-01-15', orderCount: 5 },
-  { id: 2, name: 'Marie Martin', email: 'marie.martin@example.com', registrationDate: '2023-02-20', orderCount: 3 },
-  { id: 3, name: 'Pierre Durand', email: 'pierre.durand@example.com', registrationDate: '2023-03-10', orderCount: 7 },
-  { id: 4, name: 'Sophie Lefebvre', email: 'sophie.lefebvre@example.com', registrationDate: '2023-04-05', orderCount: 2 },
-  { id: 5, name: 'Luc Girard', email: 'luc.girard@example.com', registrationDate: '2023-05-12', orderCount: 4 },
-]
 
-// Simulated order history
-const orderHistory = [
-  { id: '1234', date: '2023-06-15', total: 129.99, status: 'Livré' },
-  { id: '1235', date: '2023-06-16', total: 79.99, status: 'En cours de livraison' },
-  { id: '1236', date: '2023-06-17', total: 199.99, status: 'En préparation' },
-]
+
+
 
 export default function AdminCustomersPage() {
   const [customers, setCustomers] = useState<Client[]>([])

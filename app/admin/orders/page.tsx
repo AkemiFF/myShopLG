@@ -384,6 +384,8 @@ export default function AdminOrdersPage() {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="pending">En préparation</SelectItem>
+                              <SelectItem value="shipped">Remis au service de livraison</SelectItem>
+                              <SelectItem value="in_transit">Arrivé au pays de livraison</SelectItem>
                               <SelectItem value="completed">Livré</SelectItem>
                               <SelectItem value="cancelled">Annulé</SelectItem>
                             </SelectContent>
