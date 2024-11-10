@@ -65,6 +65,27 @@ export default function CheckoutPage() {
       setError('Les mots de passe ne correspondent pas.')
       return
     }
+
+    if (password.length < 8) {
+      setError('Doit faire au moins 8 caractères')
+      return
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      setError('Le mot de passe doit contenir au moins une lettre majuscule.');
+      return;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      setError('Le mot de passe doit contenir au moins une lettre minuscule.');
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      setError('Le mot de passe doit contenir au moins un chiffre.');
+      return;
+    }
+
     const clientData = {
       username: lastName.replace(/ /g, "_") + '_' + email,
       password: password,
@@ -79,6 +100,7 @@ export default function CheckoutPage() {
         phone_number: number
       }
     };
+
     const created = await createClient(clientData);
 
     if (created.success) {
