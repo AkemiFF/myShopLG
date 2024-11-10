@@ -1,15 +1,24 @@
+"use client"
+import Cookies from 'js-cookie';
 import {
     LayoutDashboard,
     LogOut,
+    MessageCircle,
     Package,
     Percent,
     Settings,
     ShoppingCart,
-    Users
+    Users,
 } from 'lucide-react';
 import Link from "next/link";
-
+import { useRouter } from 'next/navigation';
+import { Button } from './ui/button';
 export default function AdminAside() {
+    const router = useRouter();
+    const handleLogOutAdmin = () => {
+        Cookies.remove("refresh_token_main");
+        router.push('/users');
+    }
     return (
         <aside className="w-64 bg-gray-900 text-white min-h-screen flex flex-col">
             <div className="p-4">
@@ -40,6 +49,10 @@ export default function AdminAside() {
                         <Users className="mr-3 h-5 w-5" />
                         Customers
                     </Link>
+                    <Link href="/admin/contact" className="flex items-center py-2 px-4 rounded-md text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
+                        <MessageCircle className="mr-3 h-5 w-5" />
+                        Contact
+                    </Link>
                     {/* <Link href="#" className="flex items-center py-2 px-4 rounded-md text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
                         <Percent className="mr-3 h-5 w-5" />
                         Promotions
@@ -51,10 +64,10 @@ export default function AdminAside() {
                 </nav>
             </div>
             <div className="mt-auto p-4">
-                <button className="w-full flex items-center justify-center py-2 px-4 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors">
+                <Button onClick={handleLogOutAdmin} className="w-full flex items-center justify-center py-2 px-4 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors">
                     <LogOut className="mr-3 h-5 w-5" />
                     Logout
-                </button>
+                </Button>
             </div>
         </aside>
     )

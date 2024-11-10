@@ -52,10 +52,37 @@ export default function RegisterPage() {
       toast.error('Les mots de passe ne correspondent pas.')
       return
     }
+    if (password !== confirmPassword) {
+      setError('Les mots de passe ne correspondent pas.')
+      return
+    }
+
+    if (password.length < 8) {
+      setError('Doit faire au moins 8 caractères')
+      return
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      setError('Le mot de passe doit contenir au moins une lettre majuscule.');
+      return;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      setError('Le mot de passe doit contenir au moins une lettre minuscule.');
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      setError('Le mot de passe doit contenir au moins un chiffre.');
+      return;
+    }
     const username = name.split(' ')[0]
     registerUser(username, name, email, password);
     localStorage.setItem('email_register', email)
     rooter.push('/users/register/verification');
+  }
+  const setError = (message: string) => {
+    toast.error(message);
   }
 
   return (
