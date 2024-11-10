@@ -43,7 +43,6 @@ export default function LoginPage() {
         return response.json();
       })
       .then(data => {
-        console.log('Login successful:', data);
 
         if (data.is_admin) {
           setTokens(data.token.access, data.token.refresh);
