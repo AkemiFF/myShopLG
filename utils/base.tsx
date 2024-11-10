@@ -20,7 +20,19 @@ export const fetchCategories = async () => {
     }
 };
 
+export const showAlert = (message: string) => {
+    toast.error(message, {
+        theme: "colored",
+        autoClose: 800
+    });
+}
 
+export const showInfo = (message: string) => {
+    toast.info(message, {
+        theme: "colored",
+        autoClose: 1000
+    });
+}
 export async function addToCartOffline(productId: any, quantity = 1) {
     try {
         const response = await fetch(`${API_BASE_URL}api/cart/add/`, {
