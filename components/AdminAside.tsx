@@ -17,6 +17,7 @@ export default function AdminAside() {
     const router = useRouter();
     const handleLogOutAdmin = () => {
         Cookies.remove("refresh_token_main");
+        Cookies.remove("access_token_main");
         router.push('/users');
     }
     return (
