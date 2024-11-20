@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAdminLayoutContext } from '@/context/AdminLayoutContext'
 import { API_BASE_URL } from '@/utils/api'
-import { setTokens } from '@/utils/cookies'
+import { setAdminTokens, setManagerTokens } from '@/utils/cookies'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -43,10 +43,23 @@ export default function LoginPage() {
         return response.json();
       })
       .then(data => {
-        console.log('Login successful:', data);
+        console.log(data);
 
+
+        if (data.is_admin && data.is_manager) {
+          setManagerTokens(data.token.access, data.token.refresh);
+          setUserInfo(data.user_info);
+          toast.success('Connexion réussi', {
+            theme: "colored",
+            autoClose: 2000,
+          });
+          setTimeout(() => {
+            router.push('/manager');
+          }, 300);
+          return;
+        }
         if (data.is_admin) {
-          setTokens(data.token.access, data.token.refresh);
+          setAdminTokens(data.token.access, data.token.refresh);
           setUserInfo(data.user_info);
           toast.success('Connexion réussi', {
             theme: "colored",
@@ -54,7 +67,7 @@ export default function LoginPage() {
           });
           setTimeout(() => {
             router.push('/admin');
-          }, 2000);
+          }, 300);
         }
       })
       .catch(error => {

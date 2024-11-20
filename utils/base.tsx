@@ -20,30 +20,19 @@ export const fetchCategories = async () => {
     }
 };
 
-export const fetchClientInfo = async () => {
-    try {
-        const access = await getAccessToken();
-        const response = await fetch(`${API_BASE_URL}api/client/info/`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${access}`, // Inclure le token d'accès dans les en-têtes
-            },
-        });
+export const showAlert = (message: string) => {
+    toast.error(message, {
+        theme: "colored",
+        autoClose: 800
+    });
+}
 
-        if (!response.ok) {
-            throw new Error(`Erreur ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-
-        return data;
-    } catch (error) {
-        console.error('Erreur lors de la récupération des informations du client:', error);
-        return null;
-    }
-};
-
+export const showInfo = (message: string) => {
+    toast.info(message, {
+        theme: "colored",
+        autoClose: 1000
+    });
+}
 export async function addToCartOffline(productId: any, quantity = 1) {
     try {
         const response = await fetch(`${API_BASE_URL}api/cart/add/`, {
@@ -63,7 +52,7 @@ export async function addToCartOffline(productId: any, quantity = 1) {
         const data = await response.json();
         toast.success('Ajout éfféctué !', {
             theme: "colored",
-            autoClose: 3000,
+            autoClose: 1000,
         });
         return data;
     } catch (error) {
@@ -96,7 +85,7 @@ export async function addToCart(productId: any, quantity = 1) {
         const data = await response.json();
         toast.success('Ajout éfféctué !', {
             theme: "colored",
-            autoClose: 3000,
+            autoClose: 1000,
         });
         return data;
     } catch (error) {

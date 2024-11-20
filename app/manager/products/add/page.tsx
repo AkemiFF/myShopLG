@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Category } from "@/lib/store"
 import { API_BASE_URL } from "@/utils/api"
 import { fetchCategories } from "@/utils/base"
-import getAdminAccessToken from "@/utils/cookies"
+import { getManagerAccessToken } from "@/utils/cookies"
 import { Plus, Upload } from 'lucide-react'
 import { AwaitedReactNode, JSXElementConstructor, ReactElement, ReactNode, useEffect, useState } from 'react'
 import { toast, ToastContentProps } from "react-toastify"
@@ -143,7 +143,7 @@ export default function Component() {
         });
 
 
-        const access = await getAdminAccessToken();
+        const access = await getManagerAccessToken();
         try {
             const response = await fetch(`${API_BASE_URL}api/product/create/`, {
                 method: 'POST',

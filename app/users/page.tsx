@@ -1,25 +1,89 @@
 "use client"
-import { ChevronRight, Star } from 'lucide-react'
+import ProductCard from '@/components/Card/ProductCard'
+import { Category, Product } from '@/lib/store'
+import { API_BASE_URL } from '@/utils/api'
+import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+const categories = [
+  "Électronique",
+  "Maison et Jardin"
 
+]
 export default function Homepage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const fetchTopSellingProducts = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}api/product/top-selling/`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Erreur lors de la récupération des produits les plus vendus');
+        }
+
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error('Erreur:', error);
+      }
+    };
+    const fetchRecommendedProducts = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}api/product/recommended/`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Erreur lors de la récupération des produits les plus vendus');
+        }
+
+        const data = await response.json();
+        setRecommendedProducts(data);
+      } catch (error) {
+        console.error('Erreur:', error);
+      }
+    };
+
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}api/product/categories/`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Erreur lors de la récupération des catégories');
+        }
+
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error('Erreur:', error);
+      }
+    }
+    fetchCategories();
+    fetchRecommendedProducts();
+    fetchTopSellingProducts();
+  }, []);
 
 
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* 
-      <nav className="bg-gray-800 text-white py-2">
-        <div className="container mx-auto px-4 flex justify-between items-center overflow-x-auto">
-          <a href="#" className="whitespace-nowrap px-3 py-1 hover:bg-gray-700 rounded">Électronique</a>
-          <a href="#" className="whitespace-nowrap px-3 py-1 hover:bg-gray-700 rounded">Vêtements</a>
-          <a href="#" className="whitespace-nowrap px-3 py-1 hover:bg-gray-700 rounded">Maison</a>
-          <a href="#" className="whitespace-nowrap px-3 py-1 hover:bg-gray-700 rounded">Livres</a>
-          <a href="#" className="whitespace-nowrap px-3 py-1 hover:bg-gray-700 rounded">Sports</a>
-          <a href="#" className="whitespace-nowrap px-3 py-1 hover:bg-gray-700 rounded">Beauté</a>
-        </div>
-      </nav> 
-      */}
+
 
       {/* Hero Section */}
       <section className="relative h-96">
@@ -45,84 +109,49 @@ export default function Homepage() {
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold mb-6">Meilleures ventes</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((item) => (
-              <div key={item} className="border rounded-lg p-4 hover:shadow-lg transition duration-300">
-                <img src={`/placeholder.svg?height=200&width=200&text=Produit ${item}`} alt={`Produit ${item}`} className="w-full h-48 object-cover mb-4 rounded" />
-                <h3 className="font-semibold mb-2">Produit populaire {item}</h3>
-                <div className="flex items-center mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-current text-yellow-400" />
-                  ))}
-                  <span className="text-sm ml-1">(123)</span>
-                </div>
-                <p className="text-red-600 font-bold">19,99 €</p>
-              </div>
+          <div key="Listproducts" className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {products.map((item) => (
+              <ProductCard key={item.id} product={item} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* Categories Showcase */}
       <section className="py-12 bg-gray-100">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold mb-6">Explorez nos catégories</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold mb-4">Électronique</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-blue-600 hover:underline">Smartphones</a></li>
-                <li><a href="#" className="text-blue-600 hover:underline">Ordinateurs portables</a></li>
-                <li><a href="#" className="text-blue-600 hover:underline">Accessoires</a></li>
-              </ul>
-              <a href="#" className="inline-flex items-center mt-4 text-orange-500 hover:underline">
-                Voir plus <ChevronRight className="h-4 w-4 ml-1" />
-              </a>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {categories.slice(0, 6).map((category, index) => (
+                <div key={index} className="space-y-2">
+                  <Link href="#" className="text-blue-600 hover:underline">
+                    {category.name}
+                  </Link>
+                </div>
+              ))}
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold mb-4">Mode</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-blue-600 hover:underline">Vêtements homme</a></li>
-                <li><a href="#" className="text-blue-600 hover:underline">Vêtements femme</a></li>
-                <li><a href="#" className="text-blue-600 hover:underline">Chaussures</a></li>
-              </ul>
-              <a href="#" className="inline-flex items-center mt-4 text-orange-500 hover:underline">
-                Voir plus <ChevronRight className="h-4 w-4 ml-1" />
-              </a>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold mb-4">Maison et Jardin</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-blue-600 hover:underline">Meubles</a></li>
-                <li><a href="#" className="text-blue-600 hover:underline">Décoration</a></li>
-                <li><a href="#" className="text-blue-600 hover:underline">Jardinage</a></li>
-              </ul>
-              <a href="#" className="inline-flex items-center mt-4 text-orange-500 hover:underline">
-                Voir plus <ChevronRight className="h-4 w-4 ml-1" />
-              </a>
-            </div>
+
+            <Link
+              href="#"
+              className="inline-flex items-center mt-6 text-orange-500 hover:underline"
+            >
+              Voir plus de catégories
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Recommendations */}
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-6">Recommandé pour vous</h2>
+          <h2 className="text-2xl font-bold mb-6">Mieux Notée</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((item) => (
-              <div key={item} className="border rounded-lg p-4 hover:shadow-lg transition duration-300">
-                <img src={`/placeholder.svg?height=200&width=200&text=Recommandation ${item}`} alt={`Recommandation ${item}`} className="w-full h-48 object-cover mb-4 rounded" />
-                <h3 className="font-semibold mb-2">Produit recommandé {item}</h3>
-                <p className="text-sm text-gray-600 mb-2">Description courte du produit...</p>
-                <p className="text-red-600 font-bold">29,99 €</p>
-              </div>
+            {recommendedProducts.map((item) => (
+              <ProductCard key={item.id} product={item} />
             ))}
           </div>
         </div>
       </section>
-
-
     </div>
   )
 }

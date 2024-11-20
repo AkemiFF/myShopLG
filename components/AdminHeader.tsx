@@ -1,47 +1,49 @@
 "use client"
-import { ChevronLeft, HelpCircle, PlusIcon } from "lucide-react";
-import Link from "next/link";
-import { Button } from "./ui/button";
 
-export default function AdminHeader(props: any) {
+import { ChevronLeft, HelpCircle, PlusIcon } from "lucide-react"
+import Link from "next/link"
+import { Button } from "./ui/button"
+
+interface AdminHeaderProps {
+    addUrl?: string
+    url?: string
+    urlName?: string
+    title?: string
+}
+
+export default function AdminHeader({ addUrl, url, urlName, title }: AdminHeaderProps) {
     return (
-        <header className="bg-[#FAFAFA] p-4 flex justify-between items-center border-b shadow-sm">
-            {
-                (props.add_url) ?
-                    (<Link href={props.add_url}>
-                        <Button variant="default" size="icon" className="bg-[#FF9900] hover:bg-[#E88B00] text-white">
-                            <PlusIcon className="h-4 w-4" />
-                        </Button>
-                    </Link>) : null
-            }
-            {
-                (props.url) ?
-                    (<div className="flex items-center">
-                        <Link href={props.url}>
-                            <Button variant="ghost" size="sm" className="text-[#232F3E] hover:bg-[#EAEDED]">
-                                <ChevronLeft className="h-4 w-4 mr-2" />{props.urlName}
-                            </Button>
-                        </Link>
-                    </div>)
-                    :
-                    <div className="flex items-center">
-                    </div>
-            }
-            {
-                (props.title) ?
-                    (<div className="flex items-center">
-                        <h1 className="text-2xl font-bold text-[#232F3E]">{props.title}</h1>
-                    </div>)
-                    :
-                    <div className="flex items-center">
-                    </div>
-            }
+        <header className="bg-background p-4 flex flex-wrap justify-between items-center border-b shadow-sm">
             <div className="flex items-center space-x-4">
-                <Button variant="ghost" size="sm" className="text-[#232F3E] hover:bg-[#EAEDED]">
-                    <HelpCircle className="h-4 w-4 mr-2" />
+                {url && (
+                    <Link href={url} passHref>
+                        <Button variant="ghost" size="sm" className="text-foreground hover:bg-muted">
+                            <ChevronLeft className="h-4 w-4 mr-2" />
+                            <span className="hidden sm:inline">{urlName}</span>
+                        </Button>
+                    </Link>
+                )}
+                {title && (
+                    <h1 className="text-xl sm:text-2xl font-bold text-foreground">{title}</h1>
+                )}
+            </div>
+
+            <div className="flex items-center space-x-4">
+                {addUrl && (
+                    <Link href={addUrl} passHref>
+                        <Button variant="default" size="icon" className="bg-primary hover:bg-primary/90">
+                            <PlusIcon className="h-4 w-4" />
+                            <span className="sr-only">Add new item</span>
+                        </Button>
+                    </Link>
+                )}
+                <Button variant="ghost" size="icon" className="text-foreground hover:bg-muted" aria-label="Help">
+                    <HelpCircle className="h-4 w-4" />
                 </Button>
-                <Link href={"/users"}>
-                    <Button variant="outline" size="sm" className="border-[#FF9900] text-[#232F3E] hover:bg-[#EAEDED]">View Shop</Button>
+                <Link href="/users" passHref>
+                    <Button variant="outline" size="sm" className="border-primary text-foreground hover:bg-muted">
+                        View Shop
+                    </Button>
                 </Link>
             </div>
         </header>

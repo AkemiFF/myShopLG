@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useUser } from '@/context/UserContext'
 import { API_BASE_URL } from '@/utils/api'
+import { showAlert } from '@/utils/base'
 import { setTokens } from '@/utils/cookies'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -28,6 +29,7 @@ export default function LoginPage() {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({
         email: email,
         password: password,
@@ -36,22 +38,20 @@ export default function LoginPage() {
 
     if (response.ok) {
       const data = await response.json();
-      console.log('Login successful:', data);
+
       setTokens(data.access, data.refresh);
       setUser(data.user);
 
       toast.success('Connéxion réussi', {
         theme: "colored",
-        autoClose: 3000,
+        autoClose: 500,
       });
-      setTimeout(() => {
-        router.push('/users');
-      }, 1000);
+      router.push('/users');
+
       return data;
     } else {
       const errorData = await response.json();
-      console.error('Login failed:', errorData);
-      throw new Error(errorData.error || 'Login failed');
+      showAlert("Email ou Mot de passe incorrecte");
     }
   };
   const handleSubmit = (e: React.FormEvent) => {
@@ -94,7 +94,7 @@ export default function LoginPage() {
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full">Se connecter</Button>
             <div className="text-center text-sm">
-              <Link href="/forgot-password" className="text-blue-600 hover:underline">
+              <Link href="/users/login/forgot-password" className="text-blue-600 hover:underline">
                 Mot de passe oublié ?
               </Link>
             </div>

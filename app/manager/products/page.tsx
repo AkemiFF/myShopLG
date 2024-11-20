@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Category, Product } from '@/lib/store'
 import { API_BASE_URL } from '@/utils/api'
 import { fetchCategories } from '@/utils/base'
-import getAdminAccessToken from '@/utils/cookies'
+import { getManagerAccessToken } from '@/utils/cookies'
 import { Edit, Plus, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -21,7 +21,7 @@ export default function AdminProductsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   useEffect(() => {
     const fetchProducts = async () => {
-      const accessToken = await getAdminAccessToken();
+      const accessToken = await getManagerAccessToken();
 
 
       return fetch(`${API_BASE_URL}api/product/list/`,
@@ -80,7 +80,7 @@ export default function AdminProductsPage() {
       <Card className="w-full max-w-4xl mx-auto">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-2xl font-bold">Gestion des Produits</CardTitle>
-          <Link href="/admin/products/add">
+          <Link href="/manager/products/add">
             <Button
               className="bg-orange-500 hover:bg-orange-600 text-white"
             >

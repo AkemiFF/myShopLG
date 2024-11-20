@@ -1,11 +1,11 @@
-import AdminAside from '@/components/AdminAside'
+import ManagerAside from '@/components/ManagerAside'
 import { ReactNode } from 'react'
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <AdminAside />
+      <ManagerAside />
 
       {/* Main content */}
       <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">

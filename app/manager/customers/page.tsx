@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { API_BASE_URL } from '@/utils/api'
-import { getAdminAccessToken } from '@/utils/cookies'
+import { getManagerAccessToken } from '@/utils/cookies'
 import { format } from 'date-fns'
 import { Eye, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -55,7 +55,7 @@ export default function AdminCustomersPage() {
   )
   useEffect(() => {
     const fetchCustomers = async () => {
-      const accessToken = await getAdminAccessToken();
+      const accessToken = await getManagerAccessToken();
 
       return fetch(`${API_BASE_URL}api/clients/`,
         {

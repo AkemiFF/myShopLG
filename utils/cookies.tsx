@@ -16,6 +16,33 @@ export const setTokens = (accessToken: string, refreshToken: string) => {
         sameSite: 'Lax',
     });
 };
+export const setAdminTokens = (accessToken: string, refreshToken: string) => {
+    // Set tokens with an expiration time
+    Cookies.set('access_token_main', accessToken, {
+        expires: 1 / 48,
+        secure: true,
+        sameSite: 'Lax',
+    });
+    Cookies.set('refresh_token_main', refreshToken, {
+        expires: 7,
+        secure: true,
+        sameSite: 'Lax',
+    });
+};
+
+export const setManagerTokens = (accessToken: string, refreshToken: string) => {
+    // Set tokens with an expiration time
+    Cookies.set('access_token_manager', accessToken, {
+        expires: 1 / 48,
+        secure: true,
+        sameSite: 'Lax',
+    });
+    Cookies.set('refresh_token_manager', refreshToken, {
+        expires: 7,
+        secure: true,
+        sameSite: 'Lax',
+    });
+};
 
 
 export const getTokens = () => {
@@ -62,6 +89,82 @@ const getAccessToken = async () => {
         } catch (error) {
             // console.error('Error refreshing access token:', error);
             return null;
+        }
+    }
+
+    return accessToken;
+};
+export const getAdminAccessToken = async () => {
+    let accessToken = Cookies.get('access_token_main');
+
+    if (!accessToken) {
+        try {
+            const response = await fetch(`${API_BASE_URL}api/token/refresh/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    refresh: Cookies.get('refresh_token_main'),
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to refresh access token');
+            }
+
+            const data = await response.json();
+            accessToken = data.access;
+
+            // Set the new access token in cookies
+            if (accessToken) {
+                Cookies.set('access_token_main', accessToken, {
+                    expires: 1 / 24,
+                    secure: true,
+                    sameSite: 'Lax',
+                });
+            }
+        } catch (error) {
+            // console.error('Error refreshing access token:', error);
+            return null;
+        }
+    }
+
+    return accessToken;
+};
+export const getManagerAccessToken = async () => {
+    let accessToken = Cookies.get('access_token_manager');
+
+    if (!accessToken) {
+        try {
+            const response = await fetch(`${API_BASE_URL}api/token/refresh/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    refresh: Cookies.get('refresh_token_manager'),
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to refresh access token');
+            }
+
+            const data = await response.json();
+            accessToken = data.access;
+
+            // Set the new access token in cookies
+            if (accessToken) {
+                Cookies.set('access_token_manager', accessToken, {
+                    expires: 1 / 24,
+                    secure: true,
+                    sameSite: 'Lax',
+                });
+            }
+        } catch (error) {
+            // console.error('Error refreshing access token:', error);
+            return undefined;
         }
     }
 

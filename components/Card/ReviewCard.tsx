@@ -6,21 +6,68 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { Review } from "@/lib/store"
+import { API_BASE_URL } from "@/utils/api"
+import getAccessToken from "@/utils/cookies"
 import { ChevronRight, Star, ThumbsUp } from 'lucide-react'
-import { useState } from "react"
+import { SetStateAction, useState } from "react"
+import { toast } from "react-toastify"
 
 interface ProductReviewsProps {
     reviews: Review[]
+    id: number
 }
 
-export default function ProductReviews({ reviews }: ProductReviewsProps) {
+export default function ProductReviews({ reviews, id }: ProductReviewsProps) {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [rating, setRating] = useState(0)
+    const [titleReview, setTitleReview] = useState('');
+    const [contentReview, setContentReview] = useState('');
+
+    const handleTitleChange = (e: { target: { value: SetStateAction<string> } }) => {
+        setTitleReview(e.target.value);
+    };
+
+    const handleContentChange = (e: { target: { value: SetStateAction<string> } }) => {
+        setContentReview(e.target.value);
+    };
+    const createReview = async (reviewData: any) => {
+        const access = await getAccessToken();
+        try {
+            const response = await fetch(`${API_BASE_URL}api/product/reviews/add/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${access}`, // Si tu utilises des tokens pour l'authentification
+                },
+                body: JSON.stringify(reviewData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Erreur lors de la création de la critique');
+            }
+
+            const data = await response.json();
+            toast.info('Succès', {
+                delay: 800,
+                theme: "colored"
+            })
+            return data;
+        } catch (error) {
+            console.error('Erreur:', error);
+            return null;
+        }
+    };
 
     const handleSubmitReview = (event: React.FormEvent) => {
         event.preventDefault()
-        // Handle review submission logic here
-        console.log('Review submitted')
+        const reviewData = {
+            product: id,
+            rating: rating,
+            title: titleReview,
+            content: contentReview,
+        };
+        console.log('Review submitted:', reviewData)
+        createReview(reviewData);
         setIsModalOpen(false)
     }
     return (
@@ -96,13 +143,23 @@ export default function ProductReviews({ reviews }: ProductReviewsProps) {
                                 <Label htmlFor="title" className="text-right">
                                     Title
                                 </Label>
-                                <Input id="title" className="col-span-3" />
+                                <Input
+                                    id="title"
+                                    value={titleReview}
+                                    onChange={handleTitleChange}
+                                    className="col-span-3"
+                                />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="review" className="text-right">
                                     Review
                                 </Label>
-                                <Textarea id="review" className="col-span-3" />
+                                <Textarea
+                                    id="review"
+                                    value={contentReview}
+                                    onChange={handleContentChange}
+                                    className="col-span-3"
+                                />
                             </div>
                         </div>
                         <DialogFooter>

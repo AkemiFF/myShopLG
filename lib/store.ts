@@ -23,6 +23,7 @@ export interface Review {
 }
 // Interface principale pour Product
 export interface Product {
+  rating: number
   id: number;
   name: string;
   description: string;

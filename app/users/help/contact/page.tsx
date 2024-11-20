@@ -3,14 +3,51 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { API_BASE_URL } from "@/utils/api"
+import { showAlert, showInfo } from "@/utils/base"
 import { Facebook, Instagram, Mail, MapPin, Phone, Twitter } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
 
 export default function ContactUsPage() {
-    const handleSubmit = (e: React.FormEvent) => {
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [subject, setSubject] = useState('');
+    const [message, setMessage] = useState('');
+
+    async function submitContactForm(data: any) {
+        try {
+            const response = await fetch(`${API_BASE_URL}api/contact-us/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Erreur:', errorData);
+                return { success: false, error: errorData };
+            }
+
+            setName("");
+            setEmail("");
+            setSubject("");
+            setMessage("");
+
+            const responseData = await response.json();
+
+            showInfo('Message envoyé avec succès:');
+            return { success: true, data: responseData };
+        } catch (error) {
+            showAlert('Erreur lors de l\'envoi du message:');
+            return { success: false, error };
+        }
+    }
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        // Handle form submission logic here
-        console.log('Form submitted')
+        const data = { name, email, subject, message };
+        const submited = submitContactForm(data);
     }
 
     return (
@@ -28,19 +65,45 @@ export default function ContactUsPage() {
                             <div className="space-y-4">
                                 <div>
                                     <Label htmlFor="name">Name</Label>
-                                    <Input id="name" placeholder="Your name" required />
+                                    <Input
+                                        id="name"
+                                        placeholder="Your name"
+                                        required
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                    />
                                 </div>
                                 <div>
                                     <Label htmlFor="email">Email</Label>
-                                    <Input id="email" type="email" placeholder="Your email" required />
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="Your email"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                    />
                                 </div>
                                 <div>
                                     <Label htmlFor="subject">Subject</Label>
-                                    <Input id="subject" placeholder="Subject of your message" required />
+                                    <Input
+                                        id="subject"
+                                        placeholder="Subject of your message"
+                                        required
+                                        value={subject}
+                                        onChange={(e) => setSubject(e.target.value)}
+                                    />
                                 </div>
                                 <div>
                                     <Label htmlFor="message">Message</Label>
-                                    <Textarea id="message" placeholder="Your message" rows={4} required />
+                                    <Textarea
+                                        id="message"
+                                        placeholder="Your message"
+                                        rows={4}
+                                        required
+                                        value={message}
+                                        onChange={(e) => setMessage(e.target.value)}
+                                    />
                                 </div>
                                 <Button type="submit" className="w-full">Send Message</Button>
                             </div>

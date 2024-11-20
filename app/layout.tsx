@@ -1,4 +1,5 @@
 import { AdminLayoutProvider } from '@/context/AdminLayoutContext';
+import { SearchProvider } from '@/context/SearchContext';
 import { StoreSettingsProvider } from '@/context/StoreSettingsContext';
 import { UserProvider } from '@/context/UserContext';
 import type { Metadata } from 'next';
@@ -24,14 +25,17 @@ export default function RootLayout({
     <StoreSettingsProvider>
       <AdminLayoutProvider>
         <UserProvider>
-          <html lang="fr">
-            <body className={inter.className}>
-              <main className="min-h-screen">
+          <SearchProvider>
+
+            <html lang="fr">
+              <body className={inter.className}>
+                {/* <main className="min-h-screen"> */}
                 {children}
-              </main>
-              <ToastContainer />
-            </body>
-          </html>
+                {/* </main> */}
+                <ToastContainer />
+              </body>
+            </html>
+          </SearchProvider>
         </UserProvider>
       </AdminLayoutProvider>
     </StoreSettingsProvider>

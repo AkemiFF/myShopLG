@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { API_BASE_URL } from "@/utils/api"
 import { toast } from 'react-toastify'
 
-import { getAdminAccessToken } from "@/utils/cookies"
+import { getManagerAccessToken } from "@/utils/cookies"
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 
@@ -52,7 +52,7 @@ export default function AdminCategories() {
             fr_name: formData.get('fr_name') as string,
             description: formData.get('description') as string,
         };
-        const accessToken = await getAdminAccessToken();
+        const accessToken = await getManagerAccessToken();
         fetch(`${API_BASE_URL}api/product/category/create/`, {
             method: 'POST',
             headers: {

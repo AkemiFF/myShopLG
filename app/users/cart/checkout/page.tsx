@@ -1,14 +1,16 @@
 "use client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { DialogHeader } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useUser } from "@/context/UserContext"
 import { API_BASE_URL } from '@/utils/api'
-import { fetchClientInfo } from "@/utils/base"
-import getAccessToken from '@/utils/cookies'
+import getAccessToken, { setTokens } from '@/utils/cookies'
+import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog"
+import { AlertCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
@@ -21,25 +23,171 @@ interface CartItem {
   total_price: number;
   image_url: string | null;
 }
-
+interface Country {
+  name: string;
+  code: string;
+}
 export default function CheckoutPage() {
   const [cartItems, setCartItems] = React.useState<CartItem[]>([]);
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
   const shipping = 5.99
-  const [number, setNumber] = useState<string>();
+  const [number, setNumber] = useState<string>('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [country, setCountry] = useState('');
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
 
   const [userShippingInfo, setShippingUserInfo] = useState<any>(null);
   const total = subtotal + shipping
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   const router = useRouter();
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [countryList, setCountryList] = useState<Country[]>([]);
 
+  useEffect(() => {
+    fetch('/json/countries.json')
+      .then(response => response.json())
+      .then(data => {
+        setCountryList(data);
+      });
+
+  }, []);
+
+  const handleAddPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (password !== confirmPassword) {
+      setError('Les mots de passe ne correspondent pas.')
+      return
+    }
+
+    if (password.length < 8) {
+      setError('Doit faire au moins 8 caractères')
+      return
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      setError('Le mot de passe doit contenir au moins une lettre majuscule.');
+      return;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      setError('Le mot de passe doit contenir au moins une lettre minuscule.');
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      setError('Le mot de passe doit contenir au moins un chiffre.');
+      return;
+    }
+
+    const clientData = {
+      username: lastName.replace(/ /g, "_") + '_' + email,
+      password: password,
+      phone_number: number,
+      address: address,
+      email: email,
+      shipping_address: {
+        address: address,
+        city: city,
+        postal_code: postalCode,
+        country: country,
+        phone_number: number
+      }
+    };
+
+    const created = await createClient(clientData);
+
+    if (created.success) {
+      setIsDialogOpen(true);
+    } else {
+      showAlert('Vous avez déjà un compte lié à l\'email');
+    }
+    setIsPasswordDialogOpen(false);
+  }
+
+  const createClient = async (clientData: any) => {
+
+    try {
+      const response = await fetch(`${API_BASE_URL}api/create/order/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: "include",
+        body: JSON.stringify(clientData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+
+
+        return { success: false, data: errorData };
+      }
+
+      const data = await response.json();
+      setTokens(data.access, data.refresh);
+      setUser(data.user);
+
+      toast.info('Compte créé avec succès', {
+        theme: "colored",
+        autoClose: 500,
+
+      });
+      return { success: true, data: data };
+    } catch (error) {
+      toast.error('Vous avez déjà un compte lié à l\'email', {
+        theme: "colored",
+        autoClose: 500,
+      });
+      return { success: false, error: 'Erreur réseau' };
+    }
+  }
+  const fetchShippingInfo = async () => {
+    try {
+      const token = await getAccessToken();
+
+      if (!token) {
+        throw new Error('Token d\'accès manquant.');
+      }
+
+      const response = await fetch(`${API_BASE_URL}api/shipping-info/`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Une erreur est survenue');
+      }
+
+      // Récupérer les données de l'adresse de livraison
+      const data = await response.json();
+
+      setAddress(data.address);
+      setCity(data.city);
+      setCountry(data.country);
+      setPostalCode(data.postal_code);
+      setNumber(data.phone_number)
+
+      return data; // Retourne les données pour une utilisation ultérieure
+
+    } catch (error) {
+      console.error('Erreur lors de la récupération des informations de livraison:', (error as Error).message);
+      return null;
+    }
+  }
+  useEffect(() => {
+    if (user) { fetchShippingInfo(); }
+  }, [user]);
 
   const checkForm = () => {
     // Vérifie si des champs sont vides
@@ -81,28 +229,81 @@ export default function CheckoutPage() {
       autoClose: 3000,
     })
   }
+
   const fetchCartItems = async () => {
-    const access = await getAccessToken();
+    if (user) {
+      const access = await getAccessToken();
+
+      try {
+        const response = await fetch(`${API_BASE_URL}api/cart/`, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access}`
+          },
+        });
+
+        if (response.status === 404) {
+          setCartItems([]);
+          console.log("Votre panier est vide");
+        } else if (!response.ok) {
+          throw new Error("Erreur lors de la récupération des articles du panier");
+        } else {
+          const data = await response.json();
+          setCartItems(data.items);
+        }
+      } catch (error) {
+        // console.error("Erreur:", error);
+      }
+    } else {
+
+      try {
+        const response = await fetch(`${API_BASE_URL}api/cart/`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: 'include',
+        });
+
+        if (response.status === 404) {
+          setCartItems([]);
+        } else if (!response.ok) {
+          throw new Error("Erreur lors de la récupération des articles du panier");
+        } else {
+          const data = await response.json();
+          setCartItems(data.items);
+        }
+      } catch (error) {
+        // console.error("Erreur:", error);
+      }
+    }
+  };
+
+  const fetchClientInfo = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}api/cart/`, {
+      let access = undefined;
+      if (user) {
+        access = await getAccessToken();
+      } else {
+        return;
+      }
+      const response = await fetch(`${API_BASE_URL}api/client/info/`, {
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
-          ...(access ? { "Authorization": `Bearer ${access}` } : {}),
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${access}`,
         },
-        credentials: !access ? 'include' : undefined,
       });
 
-      if (response.status === 404) {
-        setCartItems([]);
-        console.log("Votre panier est vide");
-      } else if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des articles du panier");
-      } else {
-        const data = await response.json();
-        setCartItems(data.items);
+      if (!response.ok) {
+        throw new Error(`Erreur ${response.status}: ${response.statusText}`);
       }
+
+      const data = await response.json();
+
+      return data;
     } catch (error) {
-      // console.error("Erreur:", error);
+      console.error('Erreur lors de la récupération des informations du client:', error);
+      return null;
     }
   };
 
@@ -110,22 +311,64 @@ export default function CheckoutPage() {
     fetchCartItems();
     const getClientInfo = async () => {
       const info = await fetchClientInfo();
-      if (info) {
-        setShippingUserInfo(info.shipping_addresses);
-      }
     };
 
     getClientInfo()
-  }, []);
+
+  }, [user]);
   const handlePayement = async () => {
     return true
   }
+  const updateShippingInfo = async () => {
+    if (user) {
+      const access = await getAccessToken();
+      const response = await fetch(`${API_BASE_URL}api/update-shipping-info/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${access}`,
+        },
+        body: JSON.stringify({
+          address: address,
+          city: city,
+          postal_code: postalCode,
+          country: country,
+          phone_number: number
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+      }
+
+      toast.info("Infos de livraison mises à jour avec succès", {
+        theme: "colored",
+        autoClose: 700,
+      });
+    }
+  }
+
+  const CheckUser = async () => {
+    if (user) {
+      await updateShippingInfo();
+      return true;
+    } else {
+      setIsPasswordDialogOpen(true);
+    }
+  }
+
+  const handleConfirmOrder = async () => {
+    const check = checkForm();
+    const verifyUser = await CheckUser();
+    if (check && verifyUser) {
+      setIsDialogOpen(true);
+    }
+  }
 
   const handleSubmit = async (e: any) => {
-    // const check = checkForm();
-    // if (!check) {
-    //   return;
-    // }
+
+    setIsDialogOpen(false);
+
     const approuvedPayment = await handlePayement();
 
     if (approuvedPayment) {
@@ -270,9 +513,12 @@ export default function CheckoutPage() {
                         <SelectValue placeholder="Sélectionnez un pays" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="fr">France</SelectItem>
-                        <SelectItem value="be">Belgique</SelectItem>
-                        <SelectItem value="ch">Suisse</SelectItem>
+                        {countryList.map(country => (
+                          <SelectItem key={country.code} value={country.code}>
+                            {country.name}
+                          </SelectItem>
+                        ))}
+
                       </SelectContent>
                     </Select>
                   </div>
@@ -333,7 +579,6 @@ export default function CheckoutPage() {
               </CardContent>
             </Card>
           </div>
-
           <div>
             <Card>
               <CardHeader>
@@ -360,16 +605,122 @@ export default function CheckoutPage() {
                       <span>Total</span>
                       <span>{total.toFixed(2)} €</span>
                     </div>
+
                   </div>
                 </div>
-                <Button onClick={handleSubmit} className="w-full mt-4">Confirmer la commande</Button>
+                <Button className="w-full mt-4" onClick={handleConfirmOrder}>Confirmer la commande</Button>
+
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+
+                  <DialogContent aria-describedby="truc" aria-description="Truc" className="w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-background p-6 rounded-lg shadow-2xl">
+                    <DialogHeader className="mb-4">
+                      <DialogTitle className="text-2xl font-bold">Confirmation de la commande</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid gap-6">
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="space-y-2">
+                          <Label className="font-semibold">Nom:</Label>
+                          <span>{lastName}</span>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="font-semibold">Email:</Label>
+                          <span>{email}</span>
+                        </div>
+                        <div className="space-y-2 sm:col-span-2">
+                          <Label className="font-semibold">Adresse:</Label>
+                          <span>{address}, {city}, {postalCode}, {country}</span>
+                        </div>
+                      </div>
+                      <div className="border-t border-gray-200 pt-4">
+                        <h4 className="font-bold text-lg mb-3">Résumé de la commande:</h4>
+                        <div className="space-y-2">
+                          {cartItems.map((item) => (
+                            <div key={item.product_id} className="flex justify-between items-center">
+                              <span>{item.product_name} (x{item.quantity})</span>
+                              <span className="font-semibold">{(item.price * item.quantity).toFixed(2)} €</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="border-t border-gray-200 mt-4 pt-4">
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold">Sous-total:</span>
+                            <span>{subtotal.toFixed(2)} €</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold">Frais de livraison:</span>
+                            <span>{shipping.toFixed(2)} €</span>
+                          </div>
+                          <div className="flex justify-between items-center text-lg font-bold mt-2">
+                            <span>Total:</span>
+                            <span>{total.toFixed(2)} €</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
+                        <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="w-full sm:w-auto">Annuler</Button>
+                        <Button onClick={handleSubmit} className="w-full sm:w-auto">Confirmer la commande</Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+                <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+
+                  <DialogContent className="w-11/12 max-w-md overflow-y-auto fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-background p-6 rounded-lg shadow-2xl">
+                    <DialogHeader className="mb-4">
+                      <DialogTitle className="text-2xl font-bold">Créer un mot de passe</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleAddPassword} className="space-y-6">
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="password" className="font-semibold">
+                            Mot de passe
+                          </Label>
+                          <Input
+                            id="password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            className="w-full px-3 py-2 border rounded-md"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="confirmPassword" className="font-semibold">
+                            Confirmer le mot de passe
+                          </Label>
+                          <Input
+                            id="confirmPassword"
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                            className="w-full px-3 py-2 border rounded-md"
+                          />
+                        </div>
+                      </div>
+                      {error && (
+                        <div className="flex items-center space-x-2 text-red-600" role="alert">
+                          <AlertCircle size={20} />
+                          <span>{error}</span>
+                        </div>
+                      )}
+                      <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
+                        <Button variant="outline" onClick={() => setIsPasswordDialogOpen(false)} className="w-full sm:w-auto">
+                          Annuler
+                        </Button>
+                        <Button type="submit" className="w-full sm:w-auto">
+                          Confirmer
+                        </Button>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </CardContent>
             </Card>
           </div>
+
         </div>
       </main>
-
-
     </div>
   )
 }
