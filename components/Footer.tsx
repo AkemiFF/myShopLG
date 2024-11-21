@@ -14,7 +14,7 @@ export default function Footer() {
             <ul className="text-gray-600">
               <li><Link href="/users/products">Produits</Link></li>
               <li><Link href="/users/cart">Panier</Link></li>
-              <li><Link href="/users/profil">Mon compte</Link></li>
+              {/* <li><Link href="/users/profil">Mon compte</Link></li> */}
             </ul>
           </div>
           <div className="w-full md:w-1/4 mb-6 md:mb-0">
