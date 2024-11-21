@@ -62,7 +62,7 @@ export default function AdminSettingsPage() {
       setTimeout(() => setErrorMessage(''), 3000)
       return
     }
-    console.log('Password change request:', adminPassword)
+    // console.log('Password change request:', adminPassword)
     setSuccessMessage('Mot de passe mis à jour avec succès')
     setTimeout(() => setSuccessMessage(''), 3000)
   }

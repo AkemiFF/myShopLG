@@ -244,7 +244,7 @@ export default function CheckoutPage() {
 
         if (response.status === 404) {
           setCartItems([]);
-          console.log("Votre panier est vide");
+          // console.log("Votre panier est vide");
         } else if (!response.ok) {
           throw new Error("Erreur lors de la récupération des articles du panier");
         } else {

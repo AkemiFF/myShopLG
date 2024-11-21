@@ -43,7 +43,7 @@ export default function LoginPage() {
         return response.json();
       })
       .then(data => {
-        console.log(data);
+        // console.log(data);
 
 
         if (data.is_admin && data.is_manager) {

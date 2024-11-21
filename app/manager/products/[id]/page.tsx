@@ -33,7 +33,7 @@ export default function AdminProductDetailPage() {
   const handleSubmit = (e: any) => {
     e.preventDefault()
     // Here you would typically update the product in your backend
-    console.log('Updated product:', product)
+    // console.log('Updated product:', product)
   }
 
   return (

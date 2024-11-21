@@ -2,10 +2,15 @@ import { NextResponse } from 'next/server';
 
 // Middleware pour vérifier la présence du cookie `refresh_token_main`
 export function middleware(request) {
+    const response = NextResponse.next();
     const admin_token = request.cookies.get('refresh_token_main');
     const manager_token = request.cookies.get('refresh_token_manager');
     const client_token = request.cookies.get('refresh_token');
     const url = request.nextUrl.clone();
+
+    response.headers.delete("x-nextjs-cache");
+    response.headers.delete("x-nextjs-prerender");
+    response.headers.delete("x-nextjs-stale-time");
 
     if (url.pathname.startsWith('/users/login/unforgot')) {
         if (admin_token) {
@@ -36,7 +41,7 @@ export function middleware(request) {
         return NextResponse.next();
     }
 
-    return NextResponse.next();
+    return response;
 }
 
 export const config = {
