@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { useSearch } from '@/context/SearchContext';
 import { useUser } from '@/context/UserContext';
 import { API_BASE_URL } from '@/utils/api';
-import { Home, LogIn, Search, ShoppingCart, User } from 'lucide-react';
+import { LogIn, Search, ShoppingCart, User } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -42,10 +43,10 @@ export default function Header() {
       <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
         <div className="flex items-center space-x-4">
           <Link href="/users" className="flex items-center space-x-2">
-            {/* <Image src="/png/logo1.png" priority width={80} height={80} alt="ShopLG" className="w-auto h-12 sm:h-16" /> */}
-            {/* <Image src="/png/logo1.png" width={80} height={80} alt="ShopLG" className="w-auto h-12 sm:h-16" /> */}
-            <Home className="mr-2 h-5 w-5" /><span> Home</span>
+            <Image src="/png/favicon.png" width={80} height={80} alt="ShopLG" className="w-auto h-12 sm:h-16" />
+            {/* <Home className="mr-2 h-5 w-5" /><span> Home</span> */}
           </Link>
+
         </div>
         <form onSubmit={handleSearch} className="flex-1 max-w-2xl w-full">
           <div className="relative">
