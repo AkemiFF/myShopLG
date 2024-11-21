@@ -50,7 +50,7 @@ export default function AdminContactUsPage() {
                 }
 
                 const data = await response.json();
-                console.log(data);
+                // console.log(data);
 
                 setMessages(data);
             } catch (error) {

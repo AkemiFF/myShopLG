@@ -66,7 +66,7 @@ export default function ProductReviews({ reviews, id }: ProductReviewsProps) {
             title: titleReview,
             content: contentReview,
         };
-        console.log('Review submitted:', reviewData)
+        // console.log('Review submitted:', reviewData)
         createReview(reviewData);
         setIsModalOpen(false)
     }

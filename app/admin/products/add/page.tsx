@@ -163,7 +163,7 @@ export default function Component() {
                 autoClose: 3000,
             });
 
-            console.log('Produit créé avec succès:', responseData);
+            // console.log('Produit créé avec succès:', responseData);
             return responseData;
         } catch (error) {
             console.error('Erreur lors de la création du produit:', error);

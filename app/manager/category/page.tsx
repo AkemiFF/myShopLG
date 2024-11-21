@@ -90,7 +90,7 @@ export default function AdminCategories() {
 
 
         if (!currentCategory) return;
-        console.log(categories);
+        // console.log(categories);
         const formData = new FormData(event.currentTarget);
         const updatedCategory = {
             ...currentCategory,

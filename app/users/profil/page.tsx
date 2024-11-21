@@ -97,7 +97,7 @@ export default function UserProfilePage() {
       showInfo(data.detail || 'Mot de passe modifié avec succès!');
       setIsPasswordDialogOpen(false);
     } catch (error) {
-      console.log('Erreur: ' + (error as Error).message);
+      // console.log('Erreur: ' + (error as Error).message);
     }
   }
 

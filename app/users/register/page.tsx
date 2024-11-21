@@ -37,7 +37,7 @@ export default function RegisterPage() {
       }
 
       const data = await response.json();
-      console.log('Utilisateur créé avec succès:', data);
+      // console.log('Utilisateur créé avec succès:', data);
       return { success: true, data };
     } catch (error) {
       console.error('Erreur de requête:', error);
