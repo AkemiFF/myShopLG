@@ -13,7 +13,7 @@ import { Pencil, Plus, Trash2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 
 const fetchCategories = () => {
-    return fetch(`${API_BASE_URL}api/product/categories/`)
+    return fetch(`${API_BASE_URL}/api/product/categories/`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Erreur lors de la récupération des catégories');
@@ -53,7 +53,7 @@ export default function AdminCategories() {
             description: formData.get('description') as string,
         };
         const accessToken = await getManagerAccessToken();
-        fetch(`${API_BASE_URL}api/product/category/create/`, {
+        fetch(`${API_BASE_URL}/api/product/category/create/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ export default function AdminCategories() {
             description: formData.get('description') as string,
         };
 
-        fetch(`${API_BASE_URL}api/product/category/update/${currentCategory.id}/`, {
+        fetch(`${API_BASE_URL}/api/product/category/update/${currentCategory.id}/`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

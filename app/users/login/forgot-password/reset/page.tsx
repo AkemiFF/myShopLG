@@ -23,7 +23,7 @@ export default function ForgotPasswordResetPage() {
         }
         try {
             const access = await getAccessToken();
-            const response = await fetch(`${API_BASE_URL}api/reset-password/`, {
+            const response = await fetch(`${API_BASE_URL}/api/reset-password/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

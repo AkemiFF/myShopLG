@@ -35,7 +35,7 @@ export default function CartPage() {
     if (user) {
       const access = await getAccessToken();
       try {
-        const response = await fetch(`${API_BASE_URL}api/cart/`, {
+        const response = await fetch(`${API_BASE_URL}/api/cart/`, {
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access}`
@@ -59,7 +59,7 @@ export default function CartPage() {
     } else {
 
       try {
-        const response = await fetch(`${API_BASE_URL}api/cart/`, {
+        const response = await fetch(`${API_BASE_URL}/api/cart/`, {
           headers: {
             "Content-Type": "application/json",
           },
@@ -93,7 +93,7 @@ export default function CartPage() {
       if (user) {
         // Pour les utilisateurs connectés
         const access = await getAccessToken();
-        const response = await fetch(`${API_BASE_URL}api/cart/remove/item/`, {
+        const response = await fetch(`${API_BASE_URL}/api/cart/remove/item/`, {
           method: 'POST',
           headers: {
             "Content-Type": "application/json",
@@ -115,7 +115,7 @@ export default function CartPage() {
         }
       } else {
         // Pour les utilisateurs non connectés
-        const response = await fetch(`${API_BASE_URL}api/cart/remove/item/`, {
+        const response = await fetch(`${API_BASE_URL}/api/cart/remove/item/`, {
           method: 'POST',
           headers: {
             "Content-Type": "application/json",
@@ -145,7 +145,7 @@ export default function CartPage() {
       if (user) {
         // Pour les utilisateurs connectés
         const access = await getAccessToken();
-        const response = await fetch(`${API_BASE_URL}api/cart/decrease/`, {
+        const response = await fetch(`${API_BASE_URL}/api/cart/decrease/`, {
           method: 'POST',
           headers: {
             "Content-Type": "application/json",
@@ -167,7 +167,7 @@ export default function CartPage() {
         }
       } else {
         // Pour les utilisateurs non connectés
-        const response = await fetch(`${API_BASE_URL}api/cart/decrease/`, {
+        const response = await fetch(`${API_BASE_URL}/api/cart/decrease/`, {
           method: 'POST',
           headers: {
             "Content-Type": "application/json",

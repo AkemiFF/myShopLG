@@ -24,7 +24,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const router = useRouter();
   const loginUser = async (email: any, password: any) => {
-    const response = await fetch(`${API_BASE_URL}api/login/`, {
+    const response = await fetch(`${API_BASE_URL}/api/login/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -18,7 +18,7 @@ export default function ForgotPasswordVerifyPage() {
         e.preventDefault()
         try {
             const email = localStorage.getItem('email');
-            const response = await fetch(`${API_BASE_URL}api/verify-reset-code/`, {
+            const response = await fetch(`${API_BASE_URL}/api/verify-reset-code/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

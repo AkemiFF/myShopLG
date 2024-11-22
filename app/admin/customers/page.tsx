@@ -57,7 +57,7 @@ export default function AdminCustomersPage() {
     const fetchCustomers = async () => {
       const accessToken = await getAdminAccessToken();
 
-      return fetch(`${API_BASE_URL}api/clients/`,
+      return fetch(`${API_BASE_URL}/api/clients/`,
         {
           method: 'GET',
           headers: {

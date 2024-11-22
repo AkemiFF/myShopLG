@@ -5,7 +5,7 @@ import getAccessToken from "./cookies";
 
 export const fetchCategories = async () => {
     try {
-        const response = await fetch(`${API_BASE_URL}api/product/categories/`);
+        const response = await fetch(`${API_BASE_URL}/api/product/categories/`);
 
         if (!response.ok) {
             throw new Error('Erreur lors de la récupération des catégories');
@@ -35,7 +35,7 @@ export const showInfo = (message: string) => {
 }
 export async function addToCartOffline(productId: any, quantity = 1) {
     try {
-        const response = await fetch(`${API_BASE_URL}api/cart/add/`, {
+        const response = await fetch(`${API_BASE_URL}/api/cart/add/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export async function addToCart(productId: any, quantity = 1) {
 
 
     const access = await getAccessToken(); try {
-        const response = await fetch(`${API_BASE_URL}api/cart/add/`, {
+        const response = await fetch(`${API_BASE_URL}/api/cart/add/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

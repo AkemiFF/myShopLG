@@ -74,7 +74,7 @@ export default function UserProfilePage() {
   async function changePassword(currentPassword: any, newPassword: any, confirmPassword: any) {
     try {
       const access = await getAccessToken();
-      const response = await fetch(`${API_BASE_URL}api/client/change-password/`, {
+      const response = await fetch(`${API_BASE_URL}/api/client/change-password/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ export default function UserProfilePage() {
     event.preventDefault();
     try {
       const access = await getAccessToken();
-      const response = await fetch(`${API_BASE_URL}api/update-shipping-info/`, {
+      const response = await fetch(`${API_BASE_URL}/api/update-shipping-info/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ export default function UserProfilePage() {
   const fetchShippingAddress = async () => {
     try {
       const access = await getAccessToken();
-      const response = await fetch(`${API_BASE_URL}api/shipping-info/`, {
+      const response = await fetch(`${API_BASE_URL}/api/shipping-info/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -215,7 +215,7 @@ export default function UserProfilePage() {
   useEffect(() => {
     const fetchOrders = async () => {
       const token = await getAccessToken();
-      fetch(`${API_BASE_URL}api/order/`, {
+      fetch(`${API_BASE_URL}/api/order/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

@@ -10,8 +10,14 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'i.giphy.com',
             },
+            {
+                protocol: 'https',
+                hostname: 'gkjguutd-shop-chjv-ugu.onrender.com',
+            },
         ],
+        minimumCacheTTL: 60,
     },
+
     async headers() {
         return [
             {

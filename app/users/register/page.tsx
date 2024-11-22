@@ -20,7 +20,7 @@ export default function RegisterPage() {
   const rooter = useRouter();
   async function registerUser(username: any, first_name: any, email: any, password: any) {
     try {
-      const response = await fetch(`${API_BASE_URL}api/register/`, {
+      const response = await fetch(`${API_BASE_URL}/api/register/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

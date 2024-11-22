@@ -114,7 +114,7 @@ export default function CheckoutPage() {
   const createClient = async (clientData: any) => {
 
     try {
-      const response = await fetch(`${API_BASE_URL}api/create/order/`, {
+      const response = await fetch(`${API_BASE_URL}/api/create/order/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -156,7 +156,7 @@ export default function CheckoutPage() {
         throw new Error('Token d\'accès manquant.');
       }
 
-      const response = await fetch(`${API_BASE_URL}api/shipping-info/`, {
+      const response = await fetch(`${API_BASE_URL}/api/shipping-info/`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -235,7 +235,7 @@ export default function CheckoutPage() {
       const access = await getAccessToken();
 
       try {
-        const response = await fetch(`${API_BASE_URL}api/cart/`, {
+        const response = await fetch(`${API_BASE_URL}/api/cart/`, {
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access}`
@@ -257,7 +257,7 @@ export default function CheckoutPage() {
     } else {
 
       try {
-        const response = await fetch(`${API_BASE_URL}api/cart/`, {
+        const response = await fetch(`${API_BASE_URL}/api/cart/`, {
           headers: {
             "Content-Type": "application/json",
           },
@@ -286,7 +286,7 @@ export default function CheckoutPage() {
       } else {
         return;
       }
-      const response = await fetch(`${API_BASE_URL}api/client/info/`, {
+      const response = await fetch(`${API_BASE_URL}/api/client/info/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -322,7 +322,7 @@ export default function CheckoutPage() {
   const updateShippingInfo = async () => {
     if (user) {
       const access = await getAccessToken();
-      const response = await fetch(`${API_BASE_URL}api/update-shipping-info/`, {
+      const response = await fetch(`${API_BASE_URL}/api/update-shipping-info/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -380,7 +380,7 @@ export default function CheckoutPage() {
     const access = await getAccessToken();
     try {
 
-      const response = await fetch(`${API_BASE_URL}api/order/create/`, {
+      const response = await fetch(`${API_BASE_URL}/api/order/create/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

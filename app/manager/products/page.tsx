@@ -24,7 +24,7 @@ export default function AdminProductsPage() {
       const accessToken = await getManagerAccessToken();
 
 
-      return fetch(`${API_BASE_URL}api/product/list/`,
+      return fetch(`${API_BASE_URL}/api/product/list/`,
         {
           method: 'GET', // You can change this to 'POST' or another method if necessary
           headers: {

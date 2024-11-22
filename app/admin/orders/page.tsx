@@ -73,7 +73,7 @@ export default function AdminOrdersPage() {
   const updateOrderStatus = async (orderId: number, newStatus: string) => {
     const accessToken = await getAdminAccessToken();
     try {
-      const response = await fetch(`${API_BASE_URL}api/order/${orderId}/status/`, {
+      const response = await fetch(`${API_BASE_URL}/api/order/${orderId}/status/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ export default function AdminOrdersPage() {
     const fetchOrders = async () => {
       const accessToken = await getAdminAccessToken();
 
-      return fetch(`${API_BASE_URL}api/order/all/`,
+      return fetch(`${API_BASE_URL}/api/order/all/`,
         {
           method: 'GET',
           headers: {

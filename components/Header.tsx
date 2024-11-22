@@ -27,7 +27,7 @@ export default function Header() {
 
   const fetchSearch = (searchValue: string) => {
 
-    fetch(`${API_BASE_URL}api/product/search/?q=${searchValue}`, {
+    fetch(`${API_BASE_URL}/api/product/search/?q=${searchValue}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

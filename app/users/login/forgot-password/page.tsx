@@ -16,7 +16,7 @@ export default function ForgotPasswordEmailPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
-            const response = await fetch(`${API_BASE_URL}api/forgot-password/`, {
+            const response = await fetch(`${API_BASE_URL}/api/forgot-password/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

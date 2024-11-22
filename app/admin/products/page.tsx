@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Category, Product } from '@/lib/store'
 import { API_BASE_URL } from '@/utils/api'
 import { fetchCategories } from '@/utils/base'
-import getAdminAccessToken from '@/utils/cookies'
+import { getAdminAccessToken } from '@/utils/cookies'
 import { Edit, Plus, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -24,7 +24,7 @@ export default function AdminProductsPage() {
       const accessToken = await getAdminAccessToken();
 
 
-      return fetch(`${API_BASE_URL}api/product/list/`,
+      return fetch(`${API_BASE_URL}/api/product/list/`,
         {
           method: 'GET', // You can change this to 'POST' or another method if necessary
           headers: {

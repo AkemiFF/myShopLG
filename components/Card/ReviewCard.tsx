@@ -33,7 +33,7 @@ export default function ProductReviews({ reviews, id }: ProductReviewsProps) {
     const createReview = async (reviewData: any) => {
         const access = await getAccessToken();
         try {
-            const response = await fetch(`${API_BASE_URL}api/product/reviews/add/`, {
+            const response = await fetch(`${API_BASE_URL}/api/product/reviews/add/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

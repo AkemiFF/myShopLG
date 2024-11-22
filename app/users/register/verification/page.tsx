@@ -27,7 +27,7 @@ export default function ConfirmCodePage() {
   }, [code]);
   async function verifyCode(email: any, code: any) {
     try {
-      const response = await fetch(`${API_BASE_URL}api/verify-code/`, {
+      const response = await fetch(`${API_BASE_URL}/api/verify-code/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
