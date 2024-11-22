@@ -25,7 +25,7 @@ export default function LoginPage() {
       password: password,
     };
 
-    fetch(`${API_BASE_URL}api/user/admin/login/`, {
+    fetch(`${API_BASE_URL}/api/user/admin/login/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

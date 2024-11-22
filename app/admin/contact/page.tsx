@@ -37,7 +37,7 @@ export default function AdminContactUsPage() {
             const accessToken = await getAdminAccessToken();
 
             try {
-                const response = await fetch(`${API_BASE_URL}api/contacts/`, {
+                const response = await fetch(`${API_BASE_URL}/api/contacts/`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

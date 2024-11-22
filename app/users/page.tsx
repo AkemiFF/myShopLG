@@ -18,7 +18,7 @@ export default function Homepage() {
   useEffect(() => {
     const fetchTopSellingProducts = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}api/product/top-selling/`, {
+        const response = await fetch(`${API_BASE_URL}/api/product/top-selling/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ export default function Homepage() {
     };
     const fetchRecommendedProducts = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}api/product/recommended/`, {
+        const response = await fetch(`${API_BASE_URL}/api/product/recommended/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ export default function Homepage() {
 
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}api/product/categories/`, {
+        const response = await fetch(`${API_BASE_URL}/api/product/categories/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

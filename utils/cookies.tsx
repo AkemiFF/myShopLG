@@ -61,7 +61,7 @@ const getAccessToken = async () => {
 
     if (!accessToken) {
         try {
-            const response = await fetch(`${API_BASE_URL}api/token/refresh/`, {
+            const response = await fetch(`${API_BASE_URL}/api/token/refresh/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ export const getAdminAccessToken = async () => {
 
     if (!accessToken) {
         try {
-            const response = await fetch(`${API_BASE_URL}api/token/refresh/`, {
+            const response = await fetch(`${API_BASE_URL}/api/token/refresh/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -137,7 +137,7 @@ export const getManagerAccessToken = async () => {
 
     if (!accessToken) {
         try {
-            const response = await fetch(`${API_BASE_URL}api/token/refresh/`, {
+            const response = await fetch(`${API_BASE_URL}/api/token/refresh/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

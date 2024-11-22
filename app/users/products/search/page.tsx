@@ -46,7 +46,7 @@ export default function SearchPage() {
     const fetchData = async () => {
         await fetchCat();
         try {
-            const response = await fetch(`${API_BASE_URL}api/product/`)
+            const response = await fetch(`${API_BASE_URL}/api/product/`)
             const data = await response.json()
             setProducts(data);
             setMainData(data);

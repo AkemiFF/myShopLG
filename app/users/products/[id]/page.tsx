@@ -48,7 +48,7 @@ export default function ProductDetail() {
     }
   }
   const fetchProduct = (id: any) => {
-    fetch(`${API_BASE_URL}api/product/${id}`)
+    fetch(`${API_BASE_URL}/api/product/${id}`)
       .then(response => response.json())
       .then(data => {
         setProduct(data.product);

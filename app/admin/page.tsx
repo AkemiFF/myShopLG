@@ -38,7 +38,7 @@ export default function AdminDashboard() {
     const fetchStats = async () => {
       const accessToken = await getAdminAccessToken()
       try {
-        const response = await fetch(`${API_BASE_URL}api/dashboard/stats/`, {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/stats/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
     const fetchSales = async () => {
       const accessToken = await getAdminAccessToken()
       try {
-        const response = await fetch(`${API_BASE_URL}api/dashboard/sales-orders/`, {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/sales-orders/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

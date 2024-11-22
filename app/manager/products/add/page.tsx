@@ -145,7 +145,7 @@ export default function Component() {
 
         const access = await getManagerAccessToken();
         try {
-            const response = await fetch(`${API_BASE_URL}api/product/create/`, {
+            const response = await fetch(`${API_BASE_URL}/api/product/create/`, {
                 method: 'POST',
                 body: formData,
                 headers: {
