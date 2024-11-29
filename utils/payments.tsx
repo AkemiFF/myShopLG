@@ -27,8 +27,15 @@ const initiatePayment = async () => {
 
         // Vérifiez si l'URL est présente dans le résultat
         if (result.Data && result.Data.url) {
-            // Ouvrir l'URL dans un nouvel onglet
-            window.open(result.Data.url, '_blank');
+
+            const windowFeatures = "width=600,height=800,scrollbars=yes,resizable=yes";
+
+            // Ouvrir une nouvelle fenêtre avec les options définies
+            const newWindow = window.open(result.Data.url, '_blank', windowFeatures);
+            // window.open(result.Data.url, '_blank');
+            if (!newWindow) {
+                alert('Popup blocked by the browser. Please allow popups for this site.');
+            }
         } else {
             console.error('URL not found in the response:', result);
         }
