@@ -1,4 +1,4 @@
-export default function LoadingSpinner({ visible: boolean }) {
+export default function LoadingSpinner(visible: boolean) {
   if (visible) {
     return (
 
