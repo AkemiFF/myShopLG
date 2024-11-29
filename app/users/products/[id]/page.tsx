@@ -81,7 +81,7 @@ export default function ProductDetail() {
                 product.images.slice(1).map((img, index) => (
                   <img
                     key={index}
-                    src={`${img.image}?height=100&width=100`}
+                    src={`${API_BASE_URL + img.image}?height=100&width=100`}
                     alt={`Product Image ${index + 1}`}
                     className="w-full h-auto rounded"
                   />
