@@ -4,11 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DialogHeader } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useUser } from "@/context/UserContext"
 import { API_BASE_URL } from '@/utils/api'
 import getAccessToken, { setTokens } from '@/utils/cookies'
+import { initiateCartPayment } from "@/utils/payments"
 import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog"
 import { AlertCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -32,6 +32,7 @@ export default function CheckoutPage() {
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
   const shipping = 5.99
   const [number, setNumber] = useState<string>('');
+  const [cartId, setCartId] = useState<number>(0);
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
@@ -226,7 +227,7 @@ export default function CheckoutPage() {
   const showAlert = (message: string) => {
     toast.error(message, {
       theme: "colored",
-      autoClose: 3000,
+      autoClose: 1000,
     })
   }
 
@@ -249,6 +250,7 @@ export default function CheckoutPage() {
           throw new Error("Erreur lors de la récupération des articles du panier");
         } else {
           const data = await response.json();
+          setCartId(data.cart_id);
           setCartItems(data.items);
         }
       } catch (error) {
@@ -270,6 +272,7 @@ export default function CheckoutPage() {
           throw new Error("Erreur lors de la récupération des articles du panier");
         } else {
           const data = await response.json();
+          setCartId(data.cart_id);
           setCartItems(data.items);
         }
       } catch (error) {
@@ -317,6 +320,7 @@ export default function CheckoutPage() {
 
   }, [user]);
   const handlePayement = async () => {
+    initiateCartPayment(cartId);
     return true
   }
   const updateShippingInfo = async () => {
@@ -358,21 +362,51 @@ export default function CheckoutPage() {
   }
 
   const handleConfirmOrder = async () => {
+    saveOrderData();
+
+
     const check = checkForm();
-    const verifyUser = await CheckUser();
-    if (check && verifyUser) {
-      setIsDialogOpen(true);
+    if (check) {
+      const verifyUser = await CheckUser();
+      if (verifyUser) {
+        setIsDialogOpen(true);
+      }
     }
   }
 
   const handleSubmit = async (e: any) => {
 
     setIsDialogOpen(false);
-
     const approuvedPayment = await handlePayement();
-
+    // initiateCartPayment(cartId);
     if (approuvedPayment) {
-      CreateOrder();
+      // CreateOrder();
+    }
+  }
+
+  const saveOrderData = () => {
+    if (!user || !user.id || !total || !number || !address || !city || !postalCode || !country) {
+      console.error("All fields are required to save order data.");
+      return;
+    }
+
+    const data = {
+      user: user.id,
+      total_price: total,
+      shipping_address: {
+        phone_number: number,
+        address: address,
+        city: city,
+        postal_code: postalCode,
+        country: country,
+      },
+    };
+
+    try {
+      localStorage.setItem('orderData', JSON.stringify(data));
+      console.log("Order data saved successfully.");
+    } catch (error) {
+      console.error("Failed to save order data:", error);
     }
   }
 
@@ -526,42 +560,8 @@ export default function CheckoutPage() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Méthode de paiement</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <RadioGroup defaultValue="card">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="card" id="card" />
-                    <Label htmlFor="card">Carte de crédit</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="paypal" id="paypal" />
-                    <Label htmlFor="paypal">PayPal</Label>
-                  </div>
-                </RadioGroup>
 
-                <form className="mt-4 space-y-4">
-                  <div>
-                    <Label htmlFor="cardNumber">Numéro de carte</Label>
-                    <Input id="cardNumber" placeholder="1234 5678 9012 3456" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="expiryDate">Date d'expiration</Label>
-                      <Input id="expiryDate" placeholder="MM/AA" />
-                    </div>
-                    <div>
-                      <Label htmlFor="cvv">CVV</Label>
-                      <Input id="cvv" placeholder="123" />
-                    </div>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Méthode de livraison</CardTitle>
               </CardHeader>
@@ -577,7 +577,7 @@ export default function CheckoutPage() {
                   </div>
                 </RadioGroup>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
           <div>
             <Card>
