@@ -25,7 +25,7 @@ export const en = {
         advantages: {
             shipping: {
                 title: "Free Shipping",
-                description: "Free delivery for all orders over $500"
+                description: "Free delivery for all orders over 500€"
             },
             warranty: {
                 title: "Official Warranty",

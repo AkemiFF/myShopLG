@@ -11,10 +11,10 @@ export async function POST(req: NextRequest) {
 
         // Récupérer la signature et le corps de la requête
         const signature = req.headers.get('vpi-signature');
-        const payload = await req.text(); // Lire le corps brut de la requête
+        const payload = await req.text();
 
         if (!signature) {
-            return NextResponse.json({ error: 'Missing signature in headers' }, { status: 400 });
+            return NextResponse.json({ error: 'Missing signature in headers' }, { status: 500 });
         }
 
         // Calcul de la signature pour vérification
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
             .toUpperCase();
 
         if (computedHash !== signature) {
-            return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+            return NextResponse.json({ error: 'Invalid signature' }, { status: 501 });
         }
 
         // Analyse du corps de la requête (JSON)
