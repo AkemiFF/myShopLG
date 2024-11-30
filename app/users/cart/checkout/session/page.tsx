@@ -110,6 +110,7 @@ export default function CheckoutPage() {
         }
         setIsPasswordDialogOpen(false);
         saveOrderData();
+        handlePayement();
     }
 
     const createClient = async (clientData: any) => {
@@ -134,7 +135,7 @@ export default function CheckoutPage() {
             const data = await response.json();
             setTokens(data.access, data.refresh);
             setUser(data.user);
-
+            setSaved(true)
             toast.info('Compte créé avec succès', {
                 theme: "colored",
                 autoClose: 500,
