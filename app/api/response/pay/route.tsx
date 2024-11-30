@@ -2,6 +2,9 @@ import { CreateOrder } from '@/utils/order';
 import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 
+
+
+
 export async function POST(req: NextRequest) {
     try {
         const SECRET_KEY = process.env.KEY_SECRET;
@@ -9,9 +12,10 @@ export async function POST(req: NextRequest) {
             throw new Error('KEY_SECRET is not defined in environment variables');
         }
 
-        // Récupérer la signature et le corps de la requête
+        // Récupérer la signature et le corps de la requêteif (computedHash !== signature.toUpperCase()) {
         const signature = req.headers.get('vpi-signature');
         const payload = await req.text();
+        console.log(signature);
 
         if (!signature) {
             return NextResponse.json({ error: 'Missing signature in headers' }, { status: 500 });
@@ -24,7 +28,9 @@ export async function POST(req: NextRequest) {
             .digest('hex')
             .toUpperCase();
 
-        if (computedHash !== signature) {
+        console.log(computedHash);
+
+        if (computedHash !== signature.toUpperCase()) {
             return NextResponse.json({ error: 'Invalid signature' }, { status: 501 });
         }
 
