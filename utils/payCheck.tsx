@@ -30,6 +30,6 @@ export const payCheck = (ref: string): Promise<boolean> => {
         setTimeout(() => {
             clearInterval(intervalId);
             resolve(false);
-        }, 60000);
+        }, 600000);
     });
 };
