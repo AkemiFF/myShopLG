@@ -35,7 +35,7 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
                 ))}
                 <span className="text-sm ml-1">({product.review_count})</span>
             </div>
-            <p className="text-gray-600 mb-2">${product.price}</p>
+            <p className="text-gray-600 mb-2">{product.price}€</p>
             <div className="flex items-center space-x-5 mb-2">
                 <Button className="w-fit h-12" onClick={() => handleAddToCart(product.id)
                 }>Add to Cart</Button>

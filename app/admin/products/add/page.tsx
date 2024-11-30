@@ -389,7 +389,7 @@ export default function Component() {
                                     <div>
                                         <Label htmlFor="price">Price</Label>
                                         <div className="flex items-center">
-                                            <span className="mr-2">$</span>
+                                            <span className="mr-2">€</span>
                                             <Input
                                                 id="price"
                                                 type="number"
@@ -402,7 +402,7 @@ export default function Component() {
                                     <div>
                                         <Label htmlFor="compare-price">Compare at Price</Label>
                                         <div className="flex items-center">
-                                            <span className="mr-2">$</span>
+                                            <span className="mr-2">€</span>
                                             <Input
                                                 id="compare-price"
                                                 type="number"
