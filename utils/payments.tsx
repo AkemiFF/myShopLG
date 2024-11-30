@@ -1,4 +1,7 @@
+'use client'
 import { API_BASE_URL } from "./api";
+import { CreateOrder } from "./order";
+import { payCheck } from "./payCheck";
 
 const initiatePayment = async () => {
     const paymentData = {
@@ -59,16 +62,40 @@ export const initiateCartPayment = async (cartId: number) => {
         }
 
         const result = await response.json();
-
+        console.log(result);
         // Vérifiez si l'URL est présente dans le résultat
         if (result.Data && result.Data.url) {
-            // Ouvrir l'URL dans un nouvel onglet
-            window.open(result.Data.url, '_blank');
+            const reference = result.reference
+            const orderData = localStorage.getItem("orderData");
+            // localStorage.setItem("reference_order", reference)
+            if (orderData) {
+
+                const orderJson = JSON.parse(orderData);
+                orderJson.reference = reference;
+                CreateOrder(orderJson);
+            }
+
+            const windowFeatures = "width=600,height=800,scrollbars=yes,resizable=yes";
+            localStorage.removeItem("orderData");
+            // Ouvrir une nouvelle fenêtre avec les options définies
+            const newWindow = window.open(result.Data.url, '_blank', windowFeatures);
+            const payStatus = await payCheck(reference);
+            // window.open(result.Data.url, '_blank');
+            if (payStatus) {
+                return true;
+            }
+
+            if (!newWindow) {
+                alert('Popup blocked by the browser. Please allow popups for this site.');
+                window.open(result.Data.url, '_blank');
+            }
         } else {
             console.error('URL not found in the response:', result);
+            return false;
+
         }
     } catch (error) {
-        console.error('Error initiating payment:', error);
+        console.error('Error initiating payment:', error); return false;
     }
 }
 export default initiatePayment;

@@ -1,4 +1,3 @@
-import { toast } from "react-toastify";
 import { API_BASE_URL } from "./api";
 import getAccessToken from "./cookies";
 interface Order {
@@ -31,10 +30,10 @@ export const CreateOrder = async (orderData: Order) => {
         }
 
         const data = await response.json();
-        toast.success('Commande éffectué', {
-            theme: "colored",
-            autoClose: 3000,
-        })
+        // toast.success('Commande éffectué', {
+        //     theme: "colored",
+        //     autoClose: 3000,
+        // })
 
     }
     catch (error) {
