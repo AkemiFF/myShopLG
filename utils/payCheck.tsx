@@ -19,7 +19,6 @@ export const payCheck = (ref: string): Promise<boolean> => {
                     resolve(true); // Resolve the promise with true
                 } else {
                     console.log('Payment not confirmed yet, checking again...');
-                    resolve(false);
                 }
             } catch (error) {
                 console.error('Fetch error:', error);
