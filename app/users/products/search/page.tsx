@@ -1,6 +1,7 @@
 "use client"
 
 import ProductCard from "@/components/Card/ProductCard"
+import ProductCardSkeleton from "@/components/Card/ProductCardSkeleton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -27,7 +28,9 @@ export default function SearchPage() {
     const [minRating, setMinRating] = useState(0)
     const { search, setSearch } = useSearch();
     const [mainData, setMainData] = useState<Product[]>([]);
-    const productsPerPage = 24
+    const productsPerPage = 16
+    const [isLoading, setIsLoading] = useState(true);
+
     const handlePriceRangeChange = (value: number[]) => {
         if (value.length === 2) {
             setPriceRange([value[0], value[1]]);
@@ -50,6 +53,7 @@ export default function SearchPage() {
             const data = await response.json()
             setProducts(data);
             setMainData(data);
+            setIsLoading(false);
         } catch (error) {
             console.error("Erreur lors de la récupération des produits :", error)
         }
@@ -231,9 +235,14 @@ export default function SearchPage() {
                             </Popover>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {currentProducts.map((product) => (
-                                <ProductCard key={product.id} product={product} />
-                            ))}
+                            {isLoading
+                                ? Array(12).fill(null).map((_, index) => (
+                                    <ProductCardSkeleton key={`skeleton-${index}`} />
+                                ))
+                                : currentProducts.map((product) => (
+                                    <ProductCard key={product.id} product={product} />
+                                ))
+                            }
                         </div>
                     </main>
                 </div>

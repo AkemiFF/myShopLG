@@ -111,7 +111,7 @@ export default function ProductDetail() {
             <div className="space-y-2">
               <Button className="w-full" onClick={() => { handleAddToCart(product?.id || 0) }}>Ajouter au panier</Button>
               <LoginOrGuestDialog productId={product?.id || 0} quantity={1} isopen={isOpen} />
-              <Button variant="secondary" className="w-full">Acheter maintenant</Button>
+              {/* <Button variant="secondary" className="w-full">Acheter maintenant</Button> */}
             </div>
             <div className="flex justify-end text-sm text-gray-500">
               {/* <Button variant="ghost" size="sm">

@@ -1,5 +1,6 @@
 "use client"
 import ProductCard from '@/components/Card/ProductCard'
+import ProductCardSkeleton from '@/components/Card/ProductCardSkeleton'
 import { Category, Product } from '@/lib/store'
 import { API_BASE_URL } from '@/utils/api'
 import { ChevronRight } from 'lucide-react'
@@ -14,7 +15,7 @@ export default function Homepage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
-
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const fetchTopSellingProducts = async () => {
       try {
@@ -74,11 +75,28 @@ export default function Homepage() {
         console.error('Erreur:', error);
       }
     }
-    fetchCategories();
-    fetchRecommendedProducts();
-    fetchTopSellingProducts();
-  }, []);
+    const fetchData = async () => {
+      setIsLoading(true);
+      await Promise.all([
+        fetchCategories(),
+        fetchRecommendedProducts(),
+        fetchTopSellingProducts()
+      ]);
+      setIsLoading(false);
+    };
+    fetchData();
 
+  }, []);
+  const renderProductCards = (productList: Product[]) => {
+    if (isLoading) {
+      return Array(4).fill(null).map((_, index) => (
+        <ProductCardSkeleton key={`skeleton-${index}`} />
+      ));
+    }
+    return productList.map((item) => (
+      <ProductCard key={item.id} product={item} />
+    ));
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -110,9 +128,7 @@ export default function Homepage() {
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold mb-6">Meilleures ventes</h2>
           <div key="Listproducts" className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {products.map((item) => (
-              <ProductCard key={item.id} product={item} />
-            ))}
+            {renderProductCards(products)}
           </div>
         </div>
       </section>
@@ -122,13 +138,18 @@ export default function Homepage() {
           <h2 className="text-2xl font-bold mb-6">Explorez nos catégories</h2>
           <div className="bg-white p-6 rounded-lg shadow-md">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {categories.slice(0, 6).map((category, index) => (
-                <div key={index} className="space-y-2">
-                  <Link href="#" className="text-blue-600 hover:underline">
-                    {category.name}
-                  </Link>
-                </div>
-              ))}
+              {isLoading
+                ? Array(6).fill(null).map((_, index) => (
+                  <div key={`category-skeleton-${index}`} className="h-6 bg-gray-300 rounded animate-pulse"></div>
+                ))
+                : categories.slice(0, 6).map((category, index) => (
+                  <div key={index} className="space-y-2">
+                    <Link href="#" className="text-blue-600 hover:underline">
+                      {category.name}
+                    </Link>
+                  </div>
+                ))
+              }
             </div>
 
             <Link
@@ -146,9 +167,7 @@ export default function Homepage() {
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold mb-6">Mieux Notée</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {recommendedProducts.map((item) => (
-              <ProductCard key={item.id} product={item} />
-            ))}
+            {renderProductCards(recommendedProducts)}
           </div>
         </div>
       </section>
