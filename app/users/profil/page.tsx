@@ -138,7 +138,9 @@ export default function UserProfilePage() {
       setEditingAddress(prev => ({ ...prev, [name]: value }));
     }
   };
-
+  const detailPush = (id: number) => {
+    router.push(`/users/order/${id}`);
+  }
   const handleAddressSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
@@ -235,12 +237,6 @@ export default function UserProfilePage() {
     router.push("/users");
   }
 
-
-
-  const paymentMethods = [
-    { id: 1, type: "Visa", last4: "1234", expiry: "12/25" },
-    { id: 2, type: "Mastercard", last4: "5678", expiry: "06/24" },
-  ]
   const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
 
 
@@ -266,7 +262,7 @@ export default function UserProfilePage() {
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="orders">Commandes</TabsTrigger>
             <TabsTrigger value="addresses">Adresses</TabsTrigger>
-            <TabsTrigger value="payments">Paiements</TabsTrigger>
+
             {/* <TabsTrigger value="preferences">Préférences</TabsTrigger> */}
             <TabsTrigger value="account">Compte</TabsTrigger>
           </TabsList>
@@ -333,6 +329,7 @@ export default function UserProfilePage() {
                         <p className="text-sm">
                           {orderStatusSteps.find(step => step.value === order.status)?.description}
                         </p>
+                        <Button variant="ghost" size="sm" onClick={() => { detailPush(expandedOrder) }}>Détails</Button>
                       </div>
                     )}
                   </div>
@@ -444,28 +441,7 @@ export default function UserProfilePage() {
               </CardContent>
             </Card>
           </TabsContent>
-          <TabsContent value="payments">
-            <Card>
-              <CardHeader>
-                <CardTitle>Méthodes de paiement</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {paymentMethods.map((method) => (
-                  <div key={method.id} className="flex items-center justify-between py-4 border-b last:border-b-0">
-                    <div>
-                      <p className="font-semibold">{method.type} se terminant par {method.last4}</p>
-                      <p className="text-sm text-gray-600">Expire le {method.expiry}</p>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      <Edit2 className="h-4 w-4 mr-2" />
-                      Modifier
-                    </Button>
-                  </div>
-                ))}
-                <Button className="mt-4 w-full">Ajouter une nouvelle méthode de paiement</Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
+
           <TabsContent value="preferences">
             <Card>
               <CardHeader>
