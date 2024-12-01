@@ -215,7 +215,7 @@ export default function CheckoutPage() {
         theme: "colored",
         autoClose: 700,
       });
-      router.push('order-confirmation');
+      router.push('/users/cart/order-confirmation');
     }
     return true
   }
