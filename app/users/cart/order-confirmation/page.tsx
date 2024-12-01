@@ -1,9 +1,10 @@
 'use client'
 
+import OrderStatus from '@/components/OrderStatus'
 import { payCheck } from '@/utils/payCheck'
 import { useEffect, useState } from 'react'
 import LoadingSpinner from './LoadingSpinner'
-import OrderStatus from './OrderStatus'
+
 
 export default function OrderConfirmation() {
   const [isLoading, setIsLoading] = useState(true)
