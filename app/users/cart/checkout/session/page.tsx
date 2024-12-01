@@ -228,11 +228,11 @@ export default function CheckoutPage() {
         const payementStatus = await initiateCartPayment(cartId);
         if (payementStatus) {
             setIsPaying(false);
-            toast.success("Paiement réussi", {
-                theme: "colored",
-                autoClose: 700,
-            });
-            router.push('order-confirmation');
+            // toast.success("Paiement réussi", {
+            //     theme: "colored",
+            //     autoClose: 700,
+            // });
+            router.push('/users/cart/order-confirmation');
         }
         return true
     }

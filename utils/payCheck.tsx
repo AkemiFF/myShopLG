@@ -22,6 +22,7 @@ export const payCheck = (ref: string): Promise<boolean> => {
                 }
             } catch (error) {
                 console.error('Fetch error:', error);
+                resolve(false);
             }
         };
 
