@@ -228,6 +228,7 @@ export default function CheckoutPage() {
         const payementStatus = await initiateCartPayment(cartId);
         if (payementStatus) {
             setIsPaying(false);
+            setIsDialogOpen(false);
             // toast.success("Paiement réussi", {
             //     theme: "colored",
             //     autoClose: 700,
