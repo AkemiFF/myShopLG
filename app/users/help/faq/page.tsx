@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import anime from 'animejs'
 import { Search } from 'lucide-react'
 import Head from 'next/head'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 const faqData = [
@@ -100,7 +101,9 @@ export default function FAQPage() {
                     <div className="mt-12 text-center fade-in">
                         <h2 className="text-2xl font-semibold mb-4 dark:text-white">Encore des questions ?</h2>
                         <p className="mb-4 dark:text-gray-300">Si vous ne trouvez pas la réponse à votre question dans notre FAQ, n'hésitez pas à nous contacter.</p>
-                        <Button className="bg-black hover:bg-gray-800 text-white">Contacter le Support</Button>
+                        <Link href={"/users/help/contact"}>
+                            <Button className="bg-black hover:bg-gray-800 text-white">Contacter le Support</Button>
+                        </Link>
                     </div>
                 </main>
 
