@@ -1,5 +1,6 @@
 "use client"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -7,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { UserProfileSkeleton } from "@/components/UserProfileSkeleton"
 import { useUser } from "@/context/UserContext"
 import { API_BASE_URL } from "@/utils/api"
 import getAccessToken, { removeTokens } from "@/utils/cookies"
@@ -70,6 +72,9 @@ export default function UserProfilePage() {
   const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address>(defaultAddress);
   const [countryList, setCountryList] = useState<Country[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
+
 
   async function changePassword(currentPassword: any, newPassword: any, confirmPassword: any) {
     try {
@@ -112,15 +117,16 @@ export default function UserProfilePage() {
   };
 
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "processing": return "bg-blue-500"
+      case "shipped": return "bg-yellow-500"
+      case "delivered": return "bg-green-500"
+      case "completed": return "bg-purple-500"
+      default: return "bg-gray-500"
+    }
+  }
 
-  useEffect(() => {
-    fetch('/json/countries.json')
-      .then(response => response.json())
-      .then(data => {
-        setCountryList(data);
-      });
-
-  }, []);
   const handleEditAddress = () => {
     setEditingAddress({ ...address });
     setIsAddressDialogOpen(true);
@@ -192,9 +198,7 @@ export default function UserProfilePage() {
     }
   };
 
-  useEffect(() => {
-    fetchShippingAddress();
-  }, []);
+
 
 
   const showAlert = (message: string) => {
@@ -203,41 +207,67 @@ export default function UserProfilePage() {
       autoClose: 800
     });
   }
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  const handleOrderClick = (order: Order) => {
-    setSelectedOrder(order);
-  }
   const showInfo = (message: string) => {
     toast.info(message, {
       theme: "colored",
       autoClose: 800
     });
   }
+
+
+  const fetchOrders = async () => {
+    const token = await getAccessToken();
+    fetch(`${API_BASE_URL}/api/order/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }).then(response => response.json())
+      .then(data => {
+        setOrders(data);
+      });
+  };
+
+
   useEffect(() => {
-    const fetchOrders = async () => {
+    const fetchData = async () => {
+      setIsLoading(true);
       const token = await getAccessToken();
-      fetch(`${API_BASE_URL}/api/order/`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }).then(response => response.json())
-        .then(data => {
-          setOrders(data);
-        });
-    }
-    fetchOrders();
+      console.log(token);
+
+      if (!token) {
+        setUser(null);
+        router.push("/");
+        return;
+      }
+
+      try {
+        await Promise.all([
+          fetchShippingAddress(),
+          fetchOrders(),
+          fetch('/json/countries.json').then(response => response.json()).then(data => setCountryList(data))
+        ]);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
+  if (isLoading) {
+    return <UserProfileSkeleton />;
+  }
   const handleLogOut = () => {
     setUser(null);
     removeTokens();
     router.push("/users");
   }
 
-  const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
 
 
   const toggleOrderExpansion = (orderId: number) => {
@@ -267,55 +297,59 @@ export default function UserProfilePage() {
             <TabsTrigger value="account">Compte</TabsTrigger>
           </TabsList>
           <TabsContent value="orders">
-            <Card>
+            <Card className="w-full max-w-3xl mx-auto">
               <CardHeader>
-                <CardTitle>Historique des commandes</CardTitle>
+                <CardTitle className="text-2xl font-bold">Historique des commandes</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-0">
                 {orders.map((order) => (
                   <div key={order.id} className="border-b last:border-b-0">
                     <div
-                      className="flex items-center justify-between py-4 cursor-pointer hover:bg-gray-50 px-4"
+                      className="flex items-center justify-between py-6 cursor-pointer hover:bg-gray-50 px-6 transition-colors duration-200"
                       onClick={() => toggleOrderExpansion(order.id)}
                     >
                       <div>
-                        <p className="font-semibold">Commande #{order.id}</p>
+                        <p className="font-semibold text-lg">Commande #{order.id}</p>
                         <p className="text-sm text-gray-600">{new Date(order.created_at).toLocaleDateString()}</p>
                       </div>
                       <div className="text-right flex items-center">
-                        <div className="mr-4">
-                          <p className="font-semibold">{order.total_price} €</p>
-                          <p className="text-sm text-gray-600">{orderStatusSteps.find(step => step.value === order.status)?.label}</p>
+                        <div className="mr-6">
+                          <p className="font-semibold text-lg">
+                            {parseFloat(order.total_price).toFixed(2)} €
+                          </p>
+                          <Badge variant="secondary" className={`${getStatusColor(order.status)} text-white`}>
+                            {orderStatusSteps.find(step => step.value === order.status)?.label}
+                          </Badge>
                         </div>
-                        {expandedOrder === order.id ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                        {expandedOrder === order.id ? <ChevronUp className="h-6 w-6 text-gray-400" /> : <ChevronDown className="h-6 w-6 text-gray-400" />}
                       </div>
                     </div>
                     {expandedOrder === order.id && (
-                      <div className="py-6 px-4 bg-gray-50">
-                        <div className="flex items-center justify-between mb-6 relative">
+                      <div className="py-8 px-6 bg-gray-50">
+                        <div className="flex items-center justify-between mb-8 relative">
                           {orderStatusSteps.map((step, index) => (
                             <div key={step.value} className="flex flex-col items-center z-10 w-1/4">
                               <div
-                                className={`w-10 h-10 rounded-full border-2 flex items-center justify-center mb-2
-                                  ${orderStatusSteps.findIndex(s => s.value === order.status) >= index
-                                    ? "border-primary bg-primary text-white"
+                                className={`w-12 h-12 rounded-full border-2 flex items-center justify-center mb-3
+                          ${orderStatusSteps.findIndex(s => s.value === order.status) >= index
+                                    ? `${getStatusColor(order.status)} border-transparent text-white`
                                     : "border-gray-300 bg-white text-gray-300"
                                   }`}
                               >
                                 {index + 1}
                               </div>
-                              <p className="text-xs text-center font-medium">{step.label}</p>
+                              <p className="text-sm text-center font-medium">{step.label}</p>
                             </div>
                           ))}
-                          <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-300 -z-10" />
+                          <div className="absolute top-6 left-0 right-0 h-0.5 bg-gray-300 -z-10" />
                           {orderStatusSteps.map((step, index) => {
                             if (index < orderStatusSteps.length - 1) {
                               return (
                                 <ArrowRight
                                   key={`arrow-${index}`}
-                                  className={`absolute top-3 w-6 h-6 -ml-3
-                                    ${orderStatusSteps.findIndex(s => s.value === order.status) > index
-                                      ? "text-primary"
+                                  className={`absolute top-4 w-6 h-6 -ml-3
+                            ${orderStatusSteps.findIndex(s => s.value === order.status) > index
+                                      ? `${getStatusColor(order.status)}`
                                       : "text-gray-300"
                                     }`}
                                   style={{ left: `${(index + 1) * 25}%` }}
@@ -325,11 +359,18 @@ export default function UserProfilePage() {
                             return null;
                           })}
                         </div>
-                        <p className="text-sm font-semibold mb-2">Statut actuel:</p>
-                        <p className="text-sm">
-                          {orderStatusSteps.find(step => step.value === order.status)?.description}
-                        </p>
-                        <Button variant="ghost" size="sm" onClick={() => { detailPush(expandedOrder) }}>Détails</Button>
+                        <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
+                          <p className="text-sm font-semibold mb-2">Statut actuel:</p>
+                          <p className="text-sm">
+                            {orderStatusSteps.find(step => step.value === order.status)?.description}
+                          </p>
+                        </div>
+                        <Button
+                          onClick={() => detailPush(order.id)}
+                          className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 rounded-lg transition-colors duration-200"
+                        >
+                          Voir les détails
+                        </Button>
                       </div>
                     )}
                   </div>
