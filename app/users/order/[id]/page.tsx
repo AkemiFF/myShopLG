@@ -1,6 +1,6 @@
 "use client"
 
-import { SkeletonLoader } from "@/components/SkeletonLoader"
+import { SkeletonLoader } from "@/components/skeleton/SkeletonLoader"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { API_BASE_URL } from "@/utils/api"
 import getAccessToken from "@/utils/cookies"

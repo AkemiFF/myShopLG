@@ -24,7 +24,7 @@ const productData = {
 export default function AdminProductDetailPage() {
   const { id } = useParams()
   const [product, setProduct] = useState(productData)
-
+  
   const handleInputChange = (e: any) => {
     const { name, value } = e.target
     setProduct({ ...product, [name]: value })

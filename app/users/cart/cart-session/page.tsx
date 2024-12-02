@@ -2,9 +2,12 @@
 import ProductCard from "@/components/Card/ProductCard"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useUser } from "@/context/UserContext"
 import { Product } from "@/lib/store"
 import { API_BASE_URL } from "@/utils/api"
-import { addToCartOffline } from "@/utils/base"
+import { addToCart, addToCartOffline } from "@/utils/base"
+import getAccessToken from "@/utils/cookies"
 import { Minus, Plus, X } from 'lucide-react'
 import { useEffect, useState } from "react"
 
@@ -22,12 +25,15 @@ interface CartItem {
 export default function CartPage() {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const subtotal = cartItems.reduce((acc, item) => acc + item.total_price, 0)
 
     const total = subtotal
-    const [noCart, setNoCart] = useState(true);
+    const [noCart, setNoCart] = useState(false);
+    const { user } = useUser();
 
     const fetchCartItems = () => {
+        setIsLoading(true);
         fetch(`${API_BASE_URL}/api/cart/session/`, {
             headers: {
                 "Content-Type": "application/json",
@@ -55,73 +61,82 @@ export default function CartPage() {
             })
             .catch(error => {
                 // Handle the error
+                console.error("Error fetching cart items:", error);
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
     };
 
 
-
     const handleRemoveItem = async (productId: number) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/cart/remove/item/`, {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: 'include',
-                body: JSON.stringify({ product_id: productId }),
-            });
+            if (user) {
+                // Pour les utilisateurs connectés
+                const access = await getAccessToken();
+                const response = await fetch(`${API_BASE_URL}/api/cart/remove/item/`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${access}`,
+                    },
+                    body: JSON.stringify({ product_id: productId }),
+                });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error("Erreur API :", errorData.error || "Une erreur est survenue.");
-            } else {
-                const data = await response.json();
-                if (data.error) {
-                    console.error(data.error);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("Erreur API :", errorData.error || "Une erreur est survenue.");
                 } else {
-                    fetchCartItems();  // Actualiser les articles du panier
+                    const data = await response.json();
+                    if (data.error) {
+                        console.error(data.error);
+                    } else {
+                        fetchCartItems();  // Actualiser les articles du panier
+                    }
                 }
             }
-
         } catch (error) {
             console.error("Erreur lors de la réduction de l'article du panier:", error);
         }
     }
-
     const decreaseCartItem = async (productId: number) => {
         try {
+            if (user) {
+                // Pour les utilisateurs connectés
+                const access = await getAccessToken();
+                const response = await fetch(`${API_BASE_URL}/api/cart/decrease/`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${access}`,
+                    },
+                    body: JSON.stringify({ product_id: productId }),
+                });
 
-            // Pour les utilisateurs non connectés
-            const response = await fetch(`${API_BASE_URL}/api/cart/decrease/`, {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: 'include',
-                body: JSON.stringify({ product_id: productId }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error("Erreur API :", errorData.error || "Une erreur est survenue.");
-            } else {
-                const data = await response.json();
-                if (data.error) {
-                    console.error(data.error);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("Erreur API :", errorData.error || "Une erreur est survenue.");
                 } else {
-                    fetchCartItems();  // Actualiser les articles du panier
+                    const data = await response.json();
+                    if (data.error) {
+                        console.error(data.error);
+                    } else {
+                        fetchCartItems();  // Actualiser les articles du panier
+                    }
                 }
-            }
 
+            }
         } catch (error) {
             console.error("Erreur lors de la réduction de l'article du panier:", error);
         }
     };
 
     const handleMoreProduct = async (productId: number) => {
-
-        await addToCartOffline(productId, 1);
-
+        if (user) {
+            await addToCart(productId, 1);
+        } else {
+            await addToCartOffline(productId, 1);
+        }
         fetchCartItems();
     }
 
@@ -142,7 +157,30 @@ export default function CartPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2">
-                        {noCart ? null : (
+                        {isLoading ? (
+                            <Card>
+                                <CardHeader>
+                                    <Skeleton className="h-6 w-2/3" />
+                                </CardHeader>
+                                <CardContent>
+                                    {[1, 2, 3].map((item) => (
+                                        <div key={item} className="flex items-center space-x-4 py-4 border-b last:border-b-0">
+                                            <Skeleton className="w-24 h-24 rounded" />
+                                            <div className="flex-1 space-y-2">
+                                                <Skeleton className="h-4 w-2/3" />
+                                                <Skeleton className="h-4 w-1/3" />
+                                                <div className="flex items-center space-x-2 mt-2">
+                                                    <Skeleton className="h-8 w-8 rounded-full" />
+                                                    <Skeleton className="h-4 w-8" />
+                                                    <Skeleton className="h-8 w-8 rounded-full" />
+                                                </div>
+                                            </div>
+                                            <Skeleton className="h-8 w-8 rounded-full" />
+                                        </div>
+                                    ))}
+                                </CardContent>
+                            </Card>
+                        ) : noCart ? null : (
 
                             <Card>
                                 <CardHeader>
@@ -173,47 +211,74 @@ export default function CartPage() {
                                     ))}
                                 </CardContent>
                             </Card>
-                        )
-                        }
+                        )}
                     </div>
 
                     <div>
-                        {noCart ? (
+                        {isLoading ? (
+                            <Card>
+                                <CardHeader>
+                                    <Skeleton className="h-6 w-2/3" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-6 w-full" />
+                                    </div>
+                                    <Skeleton className="h-10 w-full mt-4" />
+                                </CardContent>
+                            </Card>
+                        ) : noCart ? (
                             <Card>
                                 <CardHeader>
                                     <CardTitle> Votre panier est vide</CardTitle>
                                 </CardHeader>
                             </Card>
-                        ) : (<><Card>
-                            <CardHeader>
-                                <CardTitle>Résumé de la commande</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-2">
-                                    <div className="flex justify-between">
-                                        <span>Sous-total</span>
-                                        <span>{subtotal.toFixed(2)} €</span>
+                        ) : (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Résumé de la commande</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between">
+                                            <span>Sous-total</span>
+                                            <span>{subtotal.toFixed(2)} €</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Frais de livraison</span>
+                                            <span>Inclus</span>
+                                        </div>
+                                        <div className="flex justify-between font-bold text-lg">
+                                            <span>Total</span>
+                                            <span>{total.toFixed(2)} €</span>
+                                        </div>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span>Frais de livraison</span>
-                                        <span>Inclus</span>
-                                    </div>
-                                    <div className="flex justify-between font-bold text-lg">
-                                        <span>Total</span>
-                                        <span>{total.toFixed(2)} €</span>
-                                    </div>
-                                </div>
-                                <a href="/users/cart/checkout/session">
-                                    <Button className="w-full mt-4">Procéder au paiement</Button>
-                                </a>
-                            </CardContent>
-                        </Card>
-                        </>
+                                    <a href="/users/cart/checkout/session">
+                                        <Button className="w-full mt-4">Procéder au paiement</Button>
+                                    </a>
+                                </CardContent>
+                            </Card>
                         )}
-
                     </div>
                 </div>
-                {noCart ? null : (
+                {isLoading ? (
+                    <div className="mt-12">
+                        <Skeleton className="h-8 w-1/3 mb-4" />
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {[1, 2, 3, 4].map((item) => (
+                                <Card key={item}>
+                                    <CardContent className="p-4">
+                                        <Skeleton className="h-40 w-full mb-2" />
+                                        <Skeleton className="h-4 w-2/3 mb-2" />
+                                        <Skeleton className="h-4 w-1/3" />
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    </div>
+                ) : noCart ? null : (
                     <div className="mt-12">
                         <h2 className="text-2xl font-bold mb-4">Recommandations</h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -222,10 +287,10 @@ export default function CartPage() {
                             ))}
                         </div>
                     </div>
-                )
-                }
+                )}
             </main>
         </div>
     )
 
 }
+

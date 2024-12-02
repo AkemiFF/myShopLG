@@ -1,7 +1,7 @@
 "use client"
 
 import ProductCard from "@/components/Card/ProductCard"
-import ProductCardSkeleton from "@/components/Card/ProductCardSkeleton"
+import ProductCardSkeleton from "@/components/skeleton/ProductCardSkeleton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"

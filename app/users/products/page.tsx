@@ -1,7 +1,10 @@
 "use client"
 import ProductCard from "@/components/Card/ProductCard"
 import Pagination from "@/components/Pagination"
+import CategoryButtonsSkeleton from "@/components/skeleton/CategoryButtonsSkeleton"
+import ProductGridSkeleton from "@/components/skeleton/ProductGridSkeleton"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Category, Product } from "@/lib/store"
 import { API_BASE_URL } from "@/utils/api"
 import { fetchCategories } from "@/utils/base"
@@ -14,18 +17,19 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [products, setProducts] = useState<Product[]>([])
   const [totalProducts, setTotalProducts] = useState(0)
+  const [loading, setLoading] = useState(true)
 
   const fetchProducts = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/product/`)
       const data = await response.json()
-
       setProducts(data)
       setTotalProducts(data.length);
-
+      setLoading(false)
 
     } catch (error) {
       console.error("Erreur lors de la récupération des produits :", error)
+
     }
   }
   const productsPerPage = 8;
@@ -34,6 +38,7 @@ export default function HomePage() {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const categories = await fetchCategories();
       setCategories(categories);
     }
@@ -55,45 +60,52 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <main className="container mx-auto py-8">
-        <div className="flex flex-wrap gap-4 mb-8">
-          <Button
-            key="1"
-            variant={selectedCategory === "All" ? "default" : "outline"}
-            onClick={() => setSelectedCategory("All")}
-            className="flex-grow md:flex-grow-0"
-          >
-            All
-          </Button>
-          {categories.map((category) => (
+      {loading ? (
+        <>
+          <CategoryButtonsSkeleton />
+          <Skeleton className="h-8 w-48 mb-4" />
+          <ProductGridSkeleton />
+        </>
+      ) : (
+        <main className="container mx-auto py-8">
+          <div className="flex flex-wrap gap-4 mb-8">
             <Button
-              key={category.id}
-              variant={selectedCategory === category.name ? "default" : "outline"}
-              onClick={() => setSelectedCategory(category.name)}
+              key="1"
+              variant={selectedCategory === "All" ? "default" : "outline"}
+              onClick={() => setSelectedCategory("All")}
               className="flex-grow md:flex-grow-0"
             >
-              {category.name}
+              All
             </Button>
-          ))}
-        </div>
+            {categories.map((category) => (
+              <Button
+                key={category.id}
+                variant={selectedCategory === category.name ? "default" : "outline"}
+                onClick={() => setSelectedCategory(category.name)}
+                className="flex-grow md:flex-grow-0"
+              >
+                {category.name}
+              </Button>
+            ))}
+          </div>
 
 
-        {/* Featured Products */}
-        <h2 className="text-2xl font-bold mb-4">Featured Products</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {currentProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+          {/* Featured Products */}
+          <h2 className="text-2xl font-bold mb-4">Featured Products</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {currentProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
 
-        {/* Pagination */}
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
-      </main>
-
+          {/* Pagination */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </main>
+      )}
     </div>
   )
 }

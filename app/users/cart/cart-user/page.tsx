@@ -2,6 +2,7 @@
 import ProductCard from "@/components/Card/ProductCard"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useUser } from "@/context/UserContext"
 import { Product } from "@/lib/store"
 import { API_BASE_URL } from "@/utils/api"
@@ -24,6 +25,7 @@ interface CartItem {
 export default function CartPage() {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const subtotal = cartItems.reduce((acc, item) => acc + item.total_price, 0)
 
     const total = subtotal
@@ -31,7 +33,7 @@ export default function CartPage() {
     const { user } = useUser();
 
     const fetchCartItems = async () => {
-
+        setIsLoading(true);
         if (user) {
             const access = await getAccessToken();
             try {
@@ -49,15 +51,16 @@ export default function CartPage() {
                     throw new Error("Erreur lors de la récupération des articles du panier");
                 } else {
                     const data = await response.json();
-
+                    setNoCart(false);
                     setRecommendedProducts(data.recommended_products)
                     setCartItems(data.items);
                 }
             } catch (error) {
                 console.error("Erreur:", error);
+            } finally {
+                setIsLoading(false);
             }
         }
-
     };
 
 
@@ -149,7 +152,30 @@ export default function CartPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2">
-                        {noCart ? null : (
+                        {isLoading ? (
+                            <Card>
+                                <CardHeader>
+                                    <Skeleton className="h-6 w-2/3" />
+                                </CardHeader>
+                                <CardContent>
+                                    {[1, 2, 3].map((item) => (
+                                        <div key={item} className="flex items-center space-x-4 py-4 border-b last:border-b-0">
+                                            <Skeleton className="w-24 h-24 rounded" />
+                                            <div className="flex-1 space-y-2">
+                                                <Skeleton className="h-4 w-2/3" />
+                                                <Skeleton className="h-4 w-1/3" />
+                                                <div className="flex items-center space-x-2 mt-2">
+                                                    <Skeleton className="h-8 w-8 rounded-full" />
+                                                    <Skeleton className="h-4 w-8" />
+                                                    <Skeleton className="h-8 w-8 rounded-full" />
+                                                </div>
+                                            </div>
+                                            <Skeleton className="h-8 w-8 rounded-full" />
+                                        </div>
+                                    ))}
+                                </CardContent>
+                            </Card>
+                        ) : noCart ? null : (
 
                             <Card>
                                 <CardHeader>
@@ -180,12 +206,25 @@ export default function CartPage() {
                                     ))}
                                 </CardContent>
                             </Card>
-                        )
-                        }
+                        )}
                     </div>
 
                     <div>
-                        {noCart ? (
+                        {isLoading ? (
+                            <Card>
+                                <CardHeader>
+                                    <Skeleton className="h-6 w-2/3" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-6 w-full" />
+                                    </div>
+                                    <Skeleton className="h-10 w-full mt-4" />
+                                </CardContent>
+                            </Card>
+                        ) : noCart ? (
                             <Card>
                                 <CardHeader>
                                     <CardTitle> Votre panier est vide</CardTitle>
@@ -222,7 +261,22 @@ export default function CartPage() {
 
                     </div>
                 </div>
-                {noCart ? null : (
+                {isLoading ? (
+                    <div className="mt-12">
+                        <Skeleton className="h-8 w-1/3 mb-4" />
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {[1, 2, 3, 4].map((item) => (
+                                <Card key={item}>
+                                    <CardContent className="p-4">
+                                        <Skeleton className="h-40 w-full mb-2" />
+                                        <Skeleton className="h-4 w-2/3 mb-2" />
+                                        <Skeleton className="h-4 w-1/3" />
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    </div>
+                ) : noCart ? null : (
                     <div className="mt-12">
                         <h2 className="text-2xl font-bold mb-4">Recommandations</h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -238,3 +292,4 @@ export default function CartPage() {
     )
 
 }
+
