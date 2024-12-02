@@ -1,53 +1,67 @@
 'use client'
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Category, Product } from '@/lib/store'
 import { API_BASE_URL } from '@/utils/api'
 import { fetchCategories } from '@/utils/base'
 import { getAdminAccessToken } from '@/utils/cookies'
+import deleteProduct from '@/utils/products'
 import { Edit, Plus, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<Category>()
   const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true)
+
+  const [productToDelete, setProductToDelete] = useState<number | null>(null)
   useEffect(() => {
     const fetchProducts = async () => {
+      setIsLoading(true)
       const accessToken = await getAdminAccessToken();
 
-
-      return fetch(`${API_BASE_URL}/api/product/list/`,
-        {
-          method: 'GET', // You can change this to 'POST' or another method if necessary
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/product/list/`, {
+          method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`, // Include the access token
+            'Authorization': `Bearer ${accessToken}`,
           },
-        })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Erreur lors de la récupération des produits');
-          }
-          return response.json();
-        })
-        .then(data => {
-          setProducts(data);
-
-        })
-        .catch((error: any) => {
-          console.error('Erreur:', error);
         });
+
+        if (!response.ok) {
+          throw new Error('Erreur lors de la récupération des produits');
+        }
+
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error('Erreur:', error);
+      } finally {
+        setIsLoading(false)
+      }
     };
 
-    fetchProducts()
+    fetchProducts();
   }, []);
 
 
@@ -71,8 +85,11 @@ export default function AdminProductsPage() {
     (categoryFilter?.name === '0' || product.category.name === categoryFilter?.name)
   )
 
-  const handleDeleteProduct = (id: number) => {
+
+  const handleDeleteProduct = async (id: number) => {
+    await deleteProduct(id);
     setProducts(products.filter(product => product.id !== id))
+    setProductToDelete(null)
   }
 
   return (
@@ -127,22 +144,53 @@ export default function AdminProductsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredProducts.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell>{product.name}</TableCell>
-                  <TableCell>{product.category.name}</TableCell>
-                  <TableCell>$ {product.price}</TableCell>
-                  <TableCell>{product.stock}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDeleteProduct(product.id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {isLoading ? (
+                Array(5).fill(0).map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell><Skeleton className="h-4 w-[250px]" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-[80px]" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-[50px]" /></TableCell>
+                    <TableCell className="text-right">
+                      <Skeleton className="h-8 w-16 ml-auto" />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                filteredProducts.map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell>{product.name}</TableCell>
+                    <TableCell>{product.category.name}</TableCell>
+                    <TableCell>$ {product.price}</TableCell>
+                    <TableCell>{product.stock}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" onClick={() => setProductToDelete(product.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ce produit ?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Cette action ne peut pas être annulée. Cela supprimera définitivement le produit
+                              et toutes les données associées.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel onClick={() => setProductToDelete(null)}>Annuler</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteProduct(product.id)}>Supprimer</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>
