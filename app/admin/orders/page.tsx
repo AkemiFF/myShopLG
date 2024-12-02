@@ -339,7 +339,7 @@ export default function AdminOrdersPage() {
                             </div>
                             <div className="flex justify-between">
                               <span>Frais de livraison</span>
-                              <span>{order.total_price} €</span>
+                              <span>Inclus</span>
                             </div>
                             <div className="flex justify-between font-bold border-t pt-2 mt-2">
                               <span>Total</span>
