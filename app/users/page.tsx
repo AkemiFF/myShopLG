@@ -1,6 +1,6 @@
 "use client"
 import ProductCard from '@/components/Card/ProductCard'
-import ProductCardSkeleton from '@/components/Card/ProductCardSkeleton'
+import ProductCardSkeleton from '@/components/skeleton/ProductCardSkeleton'
 import { Category, Product } from '@/lib/store'
 import { API_BASE_URL } from '@/utils/api'
 import { ChevronRight } from 'lucide-react'
