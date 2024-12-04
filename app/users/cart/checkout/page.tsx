@@ -154,7 +154,7 @@ export default function CheckoutPage() {
 
         if (response.status === 404) {
           setCartItems([]);
-          // console.log("Votre panier est vide");
+          router.push("/users");
         } else if (!response.ok) {
           throw new Error("Erreur lors de la récupération des articles du panier");
         } else {
@@ -163,6 +163,7 @@ export default function CheckoutPage() {
           setCartItems(data.items);
         }
       } catch (error) {
+        router.push("/users");
         // console.error("Erreur:", error);
       }
     }
@@ -256,12 +257,12 @@ export default function CheckoutPage() {
   }
 
   const handleConfirmOrder = async () => {
-    saveOrderData();
-
 
     const check = checkForm();
     if (check) {
+      saveOrderData();
       const verifyUser = await CheckUser();
+
       if (verifyUser) {
         setIsDialogOpen(true);
       }
@@ -269,13 +270,8 @@ export default function CheckoutPage() {
   }
 
   const handleSubmit = async (e: any) => {
-
     setIsDialogOpen(false);
     const approuvedPayment = await handlePayement();
-    // initiateCartPayment(cartId);
-    if (approuvedPayment) {
-      // CreateOrder();
-    }
   }
 
   const saveOrderData = () => {
