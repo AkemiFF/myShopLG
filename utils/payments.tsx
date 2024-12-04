@@ -1,5 +1,5 @@
 'use client'
-import { useRouter } from "next/navigation";
+import { } from "next/navigation";
 import { API_BASE_URL } from "./api";
 import { CreateOrder } from "./order";
 import { payCheck } from "./payCheck";
@@ -48,8 +48,7 @@ const initiatePayment = async () => {
     }
 }
 
-export const initiateCartPayment = async (cartId: number) => {
-    const router = useRouter();
+export const initiateCartPayment = async (cartId: number, router: any) => {
     try {
         const response = await fetch(`${API_BASE_URL}/payments/init-cart-payment/`, {
             method: "POST",

@@ -18,6 +18,9 @@ const LoadingSpinner: React.FC<{ visible: boolean }> = ({ visible }) => {
         <p className="text-xl text-gray-200">
           Veuillez ne pas fermer cette fenêtre
         </p>
+        <p className="text-2xl font-bold text-green-500">
+          Une autre onglet de payement à été ouvert, veuiller verifier
+        </p>
       </div>
     </div>
   );
