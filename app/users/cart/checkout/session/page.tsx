@@ -249,7 +249,7 @@ export default function CheckoutSessionPage() {
 
     const handleSubmit = async () => {
         setIsDialogOpen(false);
-        const approuvedPayment = await handlePayement();
+        await handlePayement();
     }
 
     const saveOrderData = (id: number) => {
@@ -448,7 +448,7 @@ export default function CheckoutSessionPage() {
                                                 </div>
                                                 <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
                                                     <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="w-full sm:w-auto">Annuler</Button>
-                                                    <Button onClick={() => { handleSubmit }} className="w-full sm:w-auto">Confirmer la commande</Button>
+                                                    <Button onClick={handleSubmit} className="w-full sm:w-auto">Confirmer la commande</Button>
                                                 </div>
                                             </div>
                                         </DialogContent>
