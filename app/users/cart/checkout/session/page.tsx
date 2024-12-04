@@ -225,7 +225,7 @@ export default function CheckoutPage() {
 
     const handlePayement = async () => {
         setIsPaying(true);
-        const payementStatus = await initiateCartPayment(cartId);
+        const payementStatus = await initiateCartPayment(cartId, router);
         if (payementStatus) {
             setIsPaying(false);
             setIsDialogOpen(false);

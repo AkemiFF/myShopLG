@@ -208,7 +208,7 @@ export default function CheckoutPage() {
   }, [user]);
   const handlePayement = async () => {
     setIsPaying(true);
-    const payementStatus = await initiateCartPayment(cartId);
+    const payementStatus = await initiateCartPayment(cartId, router);
     if (payementStatus) {
       setIsPaying(false);
       toast.success("Paiement réussi", {
