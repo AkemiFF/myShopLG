@@ -64,36 +64,27 @@ export default function Header() {
           </div>
         </form>
         <nav className="flex items-center space-x-2 sm:space-x-4">
-          <Link href="/users/products" passHref>
-            <Button variant="ghost" className="text-white hover:bg-gray-800">Products</Button>
-          </Link>
-          <Link href="/users/cart" passHref>
-            <Button variant="ghost" className="text-white hover:bg-gray-800">
-              <ShoppingCart className="mr-2 h-5 w-5" />
-              <span className="hidden sm:inline">Cart</span>
-            </Button>
-          </Link>
+
+          <Button variant="ghost" onClick={() => router.push('/users/products')} className="text-white hover:bg-gray-800">Products</Button>
+
+
+          <Button variant="ghost" onClick={() => router.push('/users/cart')} className="text-white hover:bg-gray-800">
+            <ShoppingCart className="mr-2 h-5 w-5" />
+            <span className="hidden sm:inline">Cart</span>
+          </Button>
           {/* <div className="bg-transparent bg-clip-padding  hover:bg-gray-800"> */}
           {user ? (
-            <Link href="/users/profil" passHref>
-              <Button variant="ghost" className="text-white hover:bg-gray-800">
-                <User className="mr-2 h-5 w-5" />
-                <span className="hidden sm:inline">Account</span>
-              </Button>
-            </Link>
+            <Button onClick={() => router.push('/users/profil')} variant="ghost" className="text-white hover:bg-gray-800">
+              <User className="mr-2 h-5 w-5" />
+              <span className="hidden sm:inline">Account</span>
+            </Button>
+
           ) : (
             <div className="flex items-center space-x-2">
-              <Link href="/users/login" passHref>
-                <Button variant="outline" className="text-black border-white hover:bg-gray-900 hover:text-white transition-colors duration-200">
-                  <LogIn className="mr-2 h-5 w-5" />
-                  <span className="hidden sm:inline">Login</span>
-                </Button>
-              </Link>
-              {/* <Link href="/users/register" passHref>
-                <Button variant="link" className=" text-white hover:bg-blue-700 transition-colors duration-200">
-                  <span className="hidden sm:inline">Sign Up</span>
-                </Button>
-              </Link> */}
+              <Button variant="outline" onClick={() => router.push('/users/login')} className="text-black border-white hover:bg-gray-900 hover:text-white transition-colors duration-200">
+                <LogIn className="mr-2 h-5 w-5" />
+                <span className="hidden sm:inline">Login</span>
+              </Button>
             </div>
           )}
           {/* </div> */}
