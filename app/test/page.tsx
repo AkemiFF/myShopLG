@@ -3,11 +3,13 @@
 import { Button } from '@/components/ui/button';
 import { payCheck } from '@/utils/payCheck';
 import { initiateCartPayment } from '@/utils/payments';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function LoginPage() {
+    const router = useRouter()
     const handlePay = async () => {
-        const data = await initiateCartPayment(1);
+        const data = await initiateCartPayment(1, router);
         console.log(data);
     }
     useEffect(() => {
