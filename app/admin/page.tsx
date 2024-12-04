@@ -22,17 +22,33 @@ interface Stats {
   conversion_rate_percentage_change: number
 }
 
+const baseTopSelling = [
+  { product_name: 'Smartphone XYZ', total_sales: 120, total_revenue: 59999.99 },
+]
+
+interface TopSelling {
+  product_name: string,
+  total_sales: number,
+  total_revenue: number
+}
+
 interface GraphStats {
   name: string
   sales: number
   orders: number
   visitors: number
 }
+const baseRecent = [
+  { id: '1234', customer: 'Jean Dupont', total: 129.99, status: 'Livré' },
+]
+interface RecentOrders { id: string, customer: string, total: number, status: string }
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats>()
   const [graphStats, setGraphStats] = useState<GraphStats[]>([])
   const [darkMode, setDarkMode] = useState(false)
+  const [topSellingProducts, setTopSellingProducts] = useState<TopSelling[]>(baseTopSelling);
+  const [recentOrders, setRecentOrders] = useState<RecentOrders[]>(baseRecent)
   const router = useRouter();
   useEffect(() => {
     const fetchStats = async () => {
@@ -54,7 +70,52 @@ export default function AdminDashboard() {
         console.error('Erreur:', error)
       }
     }
+    async function fetchTopSellingProducts() {
+      const accessToken = await getAdminAccessToken();
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/top-selling-product/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
 
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        setTopSellingProducts(data);
+        return data;
+      } catch (error) {
+        console.error("Erreur lors de la récupération des produits:", error);
+      }
+    }
+    async function fetchRecentOrders() {
+      const accessToken = await getAdminAccessToken();
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/recent-orders/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        setRecentOrders(data);
+        return data;
+      } catch (error) {
+        console.error("Erreur lors de la récupération des produits:", error);
+      }
+    }
     const fetchSales = async () => {
       const accessToken = await getAdminAccessToken()
       try {
@@ -77,6 +138,8 @@ export default function AdminDashboard() {
 
     fetchStats()
     fetchSales()
+    fetchTopSellingProducts()
+    fetchRecentOrders()
   }, [])
 
   const toggleDarkMode = () => {
@@ -230,17 +293,14 @@ export default function AdminDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {[
-                  { name: 'Smartphone XYZ', sales: 120, revenue: 59999.99 },
-                  { name: 'Casque audio ABC', sales: 85, revenue: 12749.99 },
-                  { name: 'Tablette 123', sales: 62, revenue: 24799.99 },
-                ].map((product, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell className="text-right">{product.sales}</TableCell>
-                    <TableCell className="text-right">{product.revenue.toFixed(2)} €</TableCell>
-                  </TableRow>
-                ))}
+                {Array.isArray(topSellingProducts) &&
+                  topSellingProducts.map((product, index) => (
+                    <tr key={index}>
+                      <td className="font-medium">{product.product_name}</td>
+                      <td className="text-right">{product.total_sales}</td>
+                      <td className="text-right">{product.total_revenue} €</td>
+                    </tr>
+                  ))}
               </TableBody>
             </Table>
           </CardContent>
@@ -262,13 +322,7 @@ export default function AdminDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {[
-                  { id: '1234', customer: 'Jean Dupont', total: 129.99, status: 'Livré' },
-                  { id: '1235', customer: 'Marie Martin', total: 79.99, status: 'En cours de livraison' },
-                  { id: '1236', customer: 'Pierre Durand', total: 199.99, status: 'En préparation' },
-                  { id: '1237', customer: 'Sophie Lefebvre', total: 149.99, status: 'En attente de paiement' },
-                  { id: '1238', customer: 'Luc Moreau', total: 89.99, status: 'Livré' },
-                ].map((order) => (
+                {recentOrders.map((order) => (
                   <TableRow key={order.id}>
                     <TableCell className="font-medium">{order.id}</TableCell>
                     <TableCell>{order.customer}</TableCell>
