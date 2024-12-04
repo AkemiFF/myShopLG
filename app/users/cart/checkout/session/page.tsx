@@ -28,7 +28,7 @@ interface Country {
     name: string;
     code: string;
 }
-export default function CheckoutPage() {
+export default function CheckoutSessionPage() {
     const [cartItems, setCartItems] = React.useState<CartItem[]>([]);
     const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
     const [number, setNumber] = useState<string>('');
@@ -108,9 +108,6 @@ export default function CheckoutPage() {
         } else {
             showAlert('Vous avez déjà un compte lié à l\'email');
         }
-        setIsPasswordDialogOpen(false);
-        saveOrderData();
-        handlePayement();
     }
 
     const createClient = async (clientData: any) => {
@@ -127,15 +124,17 @@ export default function CheckoutPage() {
 
             if (!response.ok) {
                 const errorData = await response.json();
-
-
                 return { success: false, data: errorData };
             }
 
             const data = await response.json();
             setTokens(data.access, data.refresh);
             setUser(data.user);
-            setSaved(true)
+            saveOrderData(data.user.id);
+            console.log(data.user.id);
+
+            setSaved(true);
+            setIsPasswordDialogOpen(false);
             toast.info('Compte créé avec succès', {
                 theme: "colored",
                 autoClose: 500,
@@ -204,6 +203,7 @@ export default function CheckoutPage() {
 
             if (response.status === 404) {
                 setCartItems([]);
+                router.push("/users");
             } else if (!response.ok) {
                 throw new Error("Erreur lors de la récupération des articles du panier");
             } else {
@@ -212,6 +212,7 @@ export default function CheckoutPage() {
                 setCartItems(data.items);
             }
         } catch (error) {
+            router.push("/users");
             // console.error("Erreur:", error);
         }
 
@@ -226,13 +227,9 @@ export default function CheckoutPage() {
     const handlePayement = async () => {
         setIsPaying(true);
         const payementStatus = await initiateCartPayment(cartId, router);
+
         if (payementStatus) {
             setIsPaying(false);
-            setIsDialogOpen(false);
-            // toast.success("Paiement réussi", {
-            //     theme: "colored",
-            //     autoClose: 700,
-            // });
             router.push('/users/cart/order-confirmation');
         }
         return true
@@ -240,35 +237,24 @@ export default function CheckoutPage() {
 
 
     const handleConfirmOrder = async () => {
-
         if (!isSaved) {
             const check = checkForm();
             if (check) {
                 setIsPasswordDialogOpen(true);
             }
         } else {
-
-            handlePayement();
+            handleSubmit();
         }
     }
 
-    const handleSubmit = async (e: any) => {
-        // setIsDialogOpen(false);
+    const handleSubmit = async () => {
+        setIsDialogOpen(false);
         const approuvedPayment = await handlePayement();
-        // initiateCartPayment(cartId);
-        if (approuvedPayment) {
-            // CreateOrder();
-        }
     }
 
-    const saveOrderData = () => {
-        if (!user || !user.id || !total || !number || !address || !city || !postalCode || !country) {
-            console.error("All fields are required to save order data.");
-            return;
-        }
-
+    const saveOrderData = (id: number) => {
         const data = {
-            user: user.id,
+            user: id,
             total_price: total,
             shipping_address: {
                 phone_number: number,
@@ -382,25 +368,6 @@ export default function CheckoutPage() {
                                     </form>
                                 </CardContent>
                             </Card>
-
-
-                            {/* <Card>
-<CardHeader>
-<CardTitle>Méthode de livraison</CardTitle>
-</CardHeader>
-<CardContent>
-<RadioGroup defaultValue="standard">
-<div className="flex items-center space-x-2">
-<RadioGroupItem value="standard" id="standard" />
-<Label htmlFor="standard">Standard (3-5 jours ouvrés)</Label>
-</div>
-<div className="flex items-center space-x-2">
-<RadioGroupItem value="express" id="express" />
-<Label htmlFor="express">Express (1-2 jours ouvrés)</Label>
-</div>
-</RadioGroup>
-</CardContent>
-</Card> */}
                         </div>
                         <div>
                             <Card>
@@ -481,7 +448,7 @@ export default function CheckoutPage() {
                                                 </div>
                                                 <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
                                                     <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="w-full sm:w-auto">Annuler</Button>
-                                                    <Button onClick={handleSubmit} className="w-full sm:w-auto">Confirmer la commande</Button>
+                                                    <Button onClick={() => { handleSubmit }} className="w-full sm:w-auto">Confirmer la commande</Button>
                                                 </div>
                                             </div>
                                         </DialogContent>
