@@ -50,7 +50,7 @@ const initiatePayment = async () => {
 
 export const initiateCartPayment = async (cartId: number, router: any) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/payments/init-cart-payment/`, {
+        const response = await fetch(`${API_BASE_URL}/payments/async-cart-pay/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
