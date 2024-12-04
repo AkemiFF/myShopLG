@@ -5,14 +5,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Category } from "@/lib/store"
 import { API_BASE_URL } from "@/utils/api"
 import { fetchCategories } from "@/utils/base"
 import { getManagerAccessToken } from "@/utils/cookies"
-import { Plus, Upload } from 'lucide-react'
+import { Plus, Trash2, Upload } from 'lucide-react'
 import { AwaitedReactNode, JSXElementConstructor, ReactElement, ReactNode, useEffect, useState } from 'react'
 import { toast, ToastContentProps } from "react-toastify"
 
@@ -22,7 +21,7 @@ export default function Component() {
     const [productName, setProductName] = useState("");
     const [description, setDescription] = useState("");
     const [category, setCategory] = useState("");
-    const [images, setImages] = useState<File[]>([]);
+    const [images, setImages] = useState<({ id: number; file: File })[]>([]);
     // États pour les champs "Shipping and Delivery"
     const [weight, setWeight] = useState<number | "">("");
     const [weightUnit, setWeightUnit] = useState("kg");
@@ -49,10 +48,8 @@ export default function Component() {
             'width',
             'height',
             'price',
-            'comparePrice',
             'sku',
             'quantity',
-            'sellingType',
 
         ];
 
@@ -120,7 +117,7 @@ export default function Component() {
         const formData = new FormData();
 
         images.forEach((image) => {
-            formData.append('images', image);
+            formData.append('images', image.file);
         });
 
         // Ajout des autres champs au FormData
@@ -224,10 +221,17 @@ export default function Component() {
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
-            setImages([...images, ...Array.from(event.target.files)]);
+            const newImages = Array.from(event.target.files).map(file => ({
+                id: Date.now() + Math.random(),
+                file
+            }));
+            setImages([...images, ...newImages]);
         }
     };
 
+    const handleImageDelete = (id: number) => {
+        setImages(prevImages => prevImages.filter(image => image.id !== id));
+    };
 
     const addSpecification = () => {
         setSpecifications([...specifications, { name: '', value: '' }])
@@ -315,13 +319,22 @@ export default function Component() {
                                             </label>
                                         </Button>
                                     </div>
-                                    {images.map((image, index) => (
-                                        <div key={index} className="bg-gray-100 rounded-lg p-4">
+                                    {images.map((image) => (
+                                        <div key={image.id} className="bg-gray-100 rounded-lg p-4 relative">
                                             <img
-                                                src={URL.createObjectURL(image)}
-                                                alt={`Preview ${index + 1}`}
+                                                src={URL.createObjectURL(image.file)}
+                                                alt={`Preview ${image.id}`}
                                                 className="w-full h-full object-cover rounded-lg"
                                             />
+                                            <Button
+                                                variant="destructive"
+                                                size="icon"
+                                                className="absolute top-2 right-2"
+                                                onClick={() => handleImageDelete(image.id)}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                                <span className="sr-only">Delete image</span>
+                                            </Button>
                                         </div>
                                     ))}
                                 </div>
@@ -399,19 +412,6 @@ export default function Component() {
                                             />
                                         </div>
                                     </div>
-                                    <div>
-                                        <Label htmlFor="compare-price">Compare at Price</Label>
-                                        <div className="flex items-center">
-                                            <span className="mr-2">$</span>
-                                            <Input
-                                                id="compare-price"
-                                                type="number"
-                                                placeholder="0.00"
-                                                value={comparePrice}
-                                                onChange={(e) => setComparePrice(e.target.value ? parseFloat(e.target.value) : "")}
-                                            />
-                                        </div>
-                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
@@ -442,25 +442,7 @@ export default function Component() {
                             </CardContent>
                         </Card>
 
-                        <Card>
-                            <CardContent className="p-6">
-                                <h2 className="text-lg font-semibold mb-4">Selling Type</h2>
-                                <RadioGroup value={sellingType} onValueChange={setSellingType}>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="in-store" id="in-store" />
-                                        <Label htmlFor="in-store">In-store selling only</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="online" id="online" />
-                                        <Label htmlFor="online">Online selling only</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="both" id="both" />
-                                        <Label htmlFor="both">Available both in-store and online</Label>
-                                    </div>
-                                </RadioGroup>
-                            </CardContent>
-                        </Card>
+
 
                         <Card className="w-full max-w-2xl">
                             <CardContent className="p-6">
@@ -511,3 +493,4 @@ export default function Component() {
     </div>
     )
 }
+

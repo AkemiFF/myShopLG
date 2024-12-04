@@ -41,7 +41,7 @@ const nextConfig = {
                     { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
                     {
                         key: "Content-Security-Policy",
-                        value: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' ${process.env.NEXT_PUBLIC_BACKEND_URL}; img-src 'self' https: data:; font-src 'self' data:;`
+                        value: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' ${process.env.NEXT_PUBLIC_BACKEND_URL}; img-src 'self' https: data: blob:;  font-src 'self' data:;`
                     },
                     {
                         key: "Access-Control-Allow-Origin",
