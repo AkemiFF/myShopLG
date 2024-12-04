@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronLeft, HelpCircle, PlusIcon } from "lucide-react"
+import { ChevronLeft, HelpCircle, PlusIcon } from 'lucide-react'
 import Link from "next/link"
 import { Button } from "./ui/button"
 
@@ -13,13 +13,13 @@ interface AdminHeaderProps {
 
 export default function AdminHeader({ addUrl, url, urlName, title }: AdminHeaderProps) {
     return (
-        <header className="bg-background p-4 flex flex-wrap justify-between items-center border-b shadow-sm">
-            <div className="flex items-center space-x-4">
+        <header className="bg-background p-4 flex flex-col md:flex-row justify-between items-start md:items-center border-b shadow-sm">
+            <div className="flex items-center space-x-4 mb-4 md:mb-0">
                 {url && (
                     <Link href={url} passHref>
                         <Button variant="ghost" size="sm" className="text-foreground hover:bg-muted">
                             <ChevronLeft className="h-4 w-4 mr-2" />
-                            <span className="hidden sm:inline">{urlName}</span>
+                            <span className="inline">{urlName}</span>
                         </Button>
                     </Link>
                 )}
@@ -49,3 +49,4 @@ export default function AdminHeader({ addUrl, url, urlName, title }: AdminHeader
         </header>
     )
 }
+

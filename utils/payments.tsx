@@ -1,4 +1,5 @@
 'use client'
+import { useRouter } from "next/navigation";
 import { API_BASE_URL } from "./api";
 import { CreateOrder } from "./order";
 import { payCheck } from "./payCheck";
@@ -48,6 +49,7 @@ const initiatePayment = async () => {
 }
 
 export const initiateCartPayment = async (cartId: number) => {
+    const router = useRouter();
     try {
         const response = await fetch(`${API_BASE_URL}/payments/init-cart-payment/`, {
             method: "POST",
@@ -75,19 +77,17 @@ export const initiateCartPayment = async (cartId: number) => {
                 CreateOrder(orderJson);
             }
 
-            const windowFeatures = "width=600,height=800,scrollbars=yes,resizable=yes";
-            localStorage.removeItem("orderData");
-            // Ouvrir une nouvelle fenêtre avec les options définies
-            const newWindow = window.open(result.Data.url, '_blank', windowFeatures);
-            const payStatus = await payCheck(reference);
-            // window.open(result.Data.url, '_blank');
-            if (payStatus) {
-                return true;
-            }
 
+            localStorage.removeItem("orderData");
+            const newWindow = window.open(result.Data.url, '_blank');
             if (!newWindow) {
                 alert('Popup blocked by the browser. Please allow popups for this site.');
-                window.open(result.Data.url, '_blank');
+                router.push(result.Data.url)
+            }
+            const payStatus = await payCheck(reference);
+
+            if (payStatus) {
+                return true;
             }
         } else {
             console.error('URL not found in the response:', result);

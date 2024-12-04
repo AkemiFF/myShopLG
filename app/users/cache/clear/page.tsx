@@ -1,8 +1,17 @@
 "use client"
+
 import { useEffect } from "react";
 
+import { useUser } from "@/context/UserContext";
+import Cookies from "js-cookie";
+
 const ClearCachePage = () => {
-    // Fonction pour supprimer les cookies
+    Cookies.remove("refresh_token_main");
+    Cookies.remove("access_token_main");
+    Cookies.remove("refresh_token");
+    Cookies.remove("access_token");
+    const { user, setUser } = useUser();
+    setUser(null);
     const clearCookies = () => {
         const cookies = document.cookie.split("; ");
         cookies.forEach((cookie) => {

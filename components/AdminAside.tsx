@@ -1,27 +1,35 @@
 "use client"
 import Cookies from 'js-cookie';
-import {
-    LayoutDashboard,
-    LogOut,
-    MessageCircle,
-    Package,
-    Percent,
-    Settings,
-    ShoppingCart,
-    Users,
-} from 'lucide-react';
+import { LayoutDashboard, LogOut, MessageCircle, Package, Percent, Settings, ShoppingCart, Users, X } from 'lucide-react';
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { Button } from './ui/button';
-export default function AdminAside() {
+
+interface AdminAsideProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+export default function AdminAside({ isOpen, onClose }: AdminAsideProps) {
     const router = useRouter();
     const handleLogOutAdmin = () => {
         Cookies.remove("refresh_token_main");
         Cookies.remove("access_token_main");
         router.push('/users');
     }
+
     return (
-        <aside className="w-64 bg-gray-900 text-white min-h-screen flex flex-col">
+        <aside className={`
+            fixed top-0 left-0 z-40 w-64 h-screen transition-transform 
+            ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+            md:translate-x-0 bg-gray-900 text-white
+        `}>
+            <div className="flex justify-between items-center p-4 md:hidden">
+                <h2 className="text-xl font-bold text-orange-500">Admin</h2>
+                <Button variant="ghost" size="icon" onClick={onClose}>
+                    <X className="h-6 w-6" />
+                </Button>
+            </div>
             <div className="p-4">
                 <div className="flex items-center mb-8">
                     <div className="w-10 h-10 bg-orange-500 rounded-full mr-3 flex items-center justify-center">
@@ -54,10 +62,6 @@ export default function AdminAside() {
                         <MessageCircle className="mr-3 h-5 w-5" />
                         Contact
                     </Link>
-                    {/* <Link href="#" className="flex items-center py-2 px-4 rounded-md text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
-                        <Percent className="mr-3 h-5 w-5" />
-                        Promotions
-                    </Link> */}
                     <Link href="/admin/settings" className="flex items-center py-2 px-4 rounded-md text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
                         <Settings className="mr-3 h-5 w-5" />
                         Settings
@@ -73,3 +77,4 @@ export default function AdminAside() {
         </aside>
     )
 }
+

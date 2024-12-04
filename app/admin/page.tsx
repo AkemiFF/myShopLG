@@ -88,17 +88,17 @@ export default function AdminDashboard() {
   const cardBgColor = darkMode ? 'bg-gray-800' : 'bg-white'
 
   return (
-    <div className={`space-y-6 min-h-screen p-6 ${bgColor} ${textColor}`}>
-      <div className="flex justify-between items-center">
+    <div className={`space-y-6 min-h-screen p-4 md:p-6 ${bgColor} ${textColor}`}>
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
         <Button onClick={toggleDarkMode} variant="outline" size="icon">
           {darkMode ? <Sun color='black' className="h-[1.2rem] w-[1.2rem]" /> : <Moon className="h-[1.2rem] w-[1.2rem]" />}
         </Button>
-        <Button onClick={() => { router.push("/users") }} className="flex justify-between w-36" variant="outline" size="default">
+        <Button onClick={() => { router.push("/users") }} className="flex justify-between w-full md:w-36" variant="outline" size="default">
           <span className="text-black">View Site </span> <Play color='black' className="h-[1.2rem] w-[1.2rem]" />
         </Button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
         <Card className={cardBgColor}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Chiffre d'affaires total</CardTitle>
@@ -156,13 +156,13 @@ export default function AdminDashboard() {
       </div>
 
       <Card className={cardBgColor}>
-        <CardHeader className="flex items-center justify-between">
+        <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between">
           <div>
             <CardTitle className="text-xl">Aperçu des performances</CardTitle>
             <CardDescription>Ventes, commandes et visiteurs pour l'année en cours</CardDescription>
           </div>
           <Select defaultValue="year">
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full md:w-[180px] mt-4 md:mt-0">
               <SelectValue placeholder="Sélectionner la période" />
             </SelectTrigger>
             <SelectContent>
@@ -173,7 +173,7 @@ export default function AdminDashboard() {
           </Select>
         </CardHeader>
         <CardContent>
-          <div className="h-[400px]">
+          <div className="h-[300px] md:h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={graphStats} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                 <defs>
@@ -214,7 +214,7 @@ export default function AdminDashboard() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
         <Card className={cardBgColor}>
           <CardHeader>
             <CardTitle className="text-xl">Produits les plus vendus</CardTitle>
@@ -291,10 +291,11 @@ export default function AdminDashboard() {
       </div>
 
       <div className="flex justify-end">
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold">
+        <Button className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold">
           Voir tous les rapports
         </Button>
       </div>
     </div>
   )
 }
+
