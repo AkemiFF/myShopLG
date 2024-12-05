@@ -1,11 +1,13 @@
 "use client"
 
 import { SkeletonLoader } from "@/components/skeleton/SkeletonLoader"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { API_BASE_URL } from "@/utils/api"
 import getAccessToken from "@/utils/cookies"
+import { initiateCartPayment } from "@/utils/payments"
 import { AlertTriangle, Check } from 'lucide-react'
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useEffect, useState } from 'react'
 
 // Placeholder for interfaces and helper functions.  Replace with actual implementations.
@@ -70,7 +72,7 @@ export default function OrderConfirmationPage() {
   const [order, setOrder] = useState<Order>();
   const [orderedItems, setOrderedItems] = useState<OrderedItems[]>(baseItems);
   const [isLoading, setIsLoading] = useState(true);
-
+  const router = useRouter();
   useEffect(() => {
     const fetchOrderData = async () => {
       if (id) {
@@ -93,8 +95,12 @@ export default function OrderConfirmationPage() {
     fetchOrderData();
   }, [id]);
 
-  const handlePayNow = () => {
-    // Implement payment logic here
+  const handlePayNow = async () => {
+    const cartId = localStorage.getItem("cartId");
+    if (cartId) {
+      await initiateCartPayment(parseInt(cartId), router)
+    }
+
     console.log("Paiement en cours...");
   };
 
@@ -127,15 +133,22 @@ export default function OrderConfirmationPage() {
                 </p>
               </>
             ) : (
-              <>
+              <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
                 <div className="flex items-center space-x-2 text-yellow-600 mb-4">
                   <AlertTriangle className="h-6 w-6" />
                   <h1 className="text-2xl font-bold">Paiement en attente</h1>
                 </div>
-                <p className="text-gray-600">
+                <p className="text-gray-600 mb-6">
                   Votre commande {orderDetails.orderNumber} a été reçue, mais le paiement n'a pas encore été effectué. Veuillez procéder au paiement pour confirmer votre commande.
                 </p>
-              </>
+                <Button
+                  variant="default"
+                  className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                  onClick={handlePayNow}
+                >
+                  Payer maintenant
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>
