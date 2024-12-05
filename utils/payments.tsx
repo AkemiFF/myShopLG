@@ -3,6 +3,7 @@ import { } from "next/navigation";
 import { API_BASE_URL } from "./api";
 import { CreateOrder } from "./order";
 import { payCheck } from "./payCheck";
+import fetchTaskStatus from "./task";
 
 const initiatePayment = async () => {
     const paymentData = {
@@ -50,7 +51,7 @@ const initiatePayment = async () => {
 
 export const initiateCartPayment = async (cartId: number, router: any) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/payments/init-cart-payment/`, {
+        const response = await fetch(`${API_BASE_URL}/payments/async-cart-pay/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -62,26 +63,29 @@ export const initiateCartPayment = async (cartId: number, router: any) => {
             throw new Error('Network response was not ok');
         }
 
-        const result = await response.json();
-        console.log(result);
+        const run = await response.json();
+
+        const result = await fetchTaskStatus(run.task_id)
         // Vérifiez si l'URL est présente dans le résultat
-        if (result.Data && result.Data.url) {
-            const reference = result.reference
+        if (result.result && result.result?.Data?.url) {
+            const url = result.result?.Data?.url;
+            const reference = result.result?.reference;
             const orderData = localStorage.getItem("orderData");
             localStorage.setItem("reference_order", reference)
-            if (orderData) {
+            console.log(orderData);
 
+            if (orderData) {
                 const orderJson = JSON.parse(orderData);
                 orderJson.reference = reference;
                 CreateOrder(orderJson);
             }
 
-
             localStorage.removeItem("orderData");
-            const newWindow = window.open(result.Data.url, '_blank');
+            const newWindow = window.open(url, '_blank');
+
             if (!newWindow) {
                 alert('Popup blocked by the browser. Please allow popups for this site.');
-                router.push(result.Data.url)
+                router.push(url)
             }
             const payStatus = await payCheck(reference);
 

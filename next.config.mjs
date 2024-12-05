@@ -34,6 +34,7 @@ const nextConfig = {
         return [
             {
                 source: "/(.*)",
+
                 headers: [
                     { key: "X-Frame-Options", value: "SAMEORIGIN" },
                     { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains; preload" },
@@ -41,22 +42,15 @@ const nextConfig = {
                     { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
                     {
                         key: "Content-Security-Policy",
-                        value: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' ${process.env.NEXT_PUBLIC_BACKEND_URL}; img-src 'self' https: data: blob:;  font-src 'self' data:;`
+                        value: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.shoplg.online; img-src 'self' https: data: blob:;  font-src 'self' data:;`
                     },
-                    {
-                        key: "Access-Control-Allow-Origin",
-                        value: process.env.NEXT_PUBLIC_BACKEND_URL
-                    },
-
+                    { key: "Access-Control-Allow-Origin", value: "https://api.shoplg.online" },
                     { key: "Access-Control-Allow-Credentials", value: "true" },
                     {
                         key: "Access-Control-Allow-Methods",
                         value: "GET,OPTIONS,PATCH,DELETE,POST,PUT"
                     },
-                    {
-                        key: "Access-Control-Allow-Headers",
-                        value: "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
-                    },
+                    { key: "Access-Control-Allow-Headers", value: "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization" },
                 ],
             },
         ];
