@@ -7,7 +7,6 @@ import { useUser } from "@/context/UserContext"
 import { Product } from "@/lib/store"
 import { API_BASE_URL } from "@/utils/api"
 import { addToCart, addToCartOffline } from "@/utils/base"
-import getAccessToken from "@/utils/cookies"
 import { Minus, Plus, X } from 'lucide-react'
 import { useEffect, useState } from "react"
 
@@ -71,60 +70,54 @@ export default function CartPage() {
 
     const handleRemoveItem = async (productId: number) => {
         try {
-            if (user) {
-                // Pour les utilisateurs connectés
-                const access = await getAccessToken();
-                const response = await fetch(`${API_BASE_URL}/api/cart/remove/item/`, {
-                    method: 'POST',
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${access}`,
-                    },
-                    body: JSON.stringify({ product_id: productId }),
-                });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error("Erreur API :", errorData.error || "Une erreur est survenue.");
+            const response = await fetch(`${API_BASE_URL}/api/cart/remove/item/`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: 'include',
+                body: JSON.stringify({ product_id: productId }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Erreur API :", errorData.error || "Une erreur est survenue.");
+            } else {
+                const data = await response.json();
+                if (data.error) {
+                    console.error(data.error);
                 } else {
-                    const data = await response.json();
-                    if (data.error) {
-                        console.error(data.error);
-                    } else {
-                        fetchCartItems();  // Actualiser les articles du panier
-                    }
+                    fetchCartItems();  // Actualiser les articles du panier
                 }
             }
+
         } catch (error) {
             console.error("Erreur lors de la réduction de l'article du panier:", error);
         }
     }
     const decreaseCartItem = async (productId: number) => {
         try {
-            if (user) {
-                // Pour les utilisateurs connectés
-                const access = await getAccessToken();
-                const response = await fetch(`${API_BASE_URL}/api/cart/decrease/`, {
-                    method: 'POST',
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${access}`,
-                    },
-                    body: JSON.stringify({ product_id: productId }),
-                });
+            const response = await fetch(`${API_BASE_URL}/api/cart/decrease/`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error("Erreur API :", errorData.error || "Une erreur est survenue.");
+                },
+                credentials: 'include',
+                body: JSON.stringify({ product_id: productId }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Erreur API :", errorData.error || "Une erreur est survenue.");
+            } else {
+                const data = await response.json();
+                if (data.error) {
+                    console.error(data.error);
                 } else {
-                    const data = await response.json();
-                    if (data.error) {
-                        console.error(data.error);
-                    } else {
-                        fetchCartItems();  // Actualiser les articles du panier
-                    }
+                    fetchCartItems();  // Actualiser les articles du panier
                 }
-
             }
         } catch (error) {
             console.error("Erreur lors de la réduction de l'article du panier:", error);
