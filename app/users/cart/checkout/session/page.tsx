@@ -231,6 +231,12 @@ export default function CheckoutSessionPage() {
         if (payementStatus) {
             setIsPaying(false);
             router.push('/users/cart/order-confirmation');
+        } else {
+            setIsPaying(false);
+            toast.error("Une erreur s'est produit, veuiller rééssayer", {
+                theme: "colored",
+                autoClose: 1000,
+            });
         }
         return true
     }
