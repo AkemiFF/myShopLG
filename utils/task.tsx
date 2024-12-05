@@ -14,7 +14,7 @@ type TaskStatusResponse = {
     error?: string;
 };
 
-async function fetchTaskStatus(taskId: string, interval = 2000): Promise<TaskStatusResponse> {
+async function fetchTaskStatus(taskId: string, interval = 7000): Promise<TaskStatusResponse> {
     return new Promise((resolve, reject) => {
         const intervalId = setInterval(async () => {
             try {
@@ -22,14 +22,14 @@ async function fetchTaskStatus(taskId: string, interval = 2000): Promise<TaskSta
                 const data: TaskStatusResponse = await response.json();
 
                 if (data.state === 'SUCCESS') {
-                    clearInterval(intervalId); // Arrête le polling
-                    resolve(data); // Retourne les données
+                    clearInterval(intervalId);
+                    resolve(data);
                 } else if (data.state === 'FAILURE') {
-                    clearInterval(intervalId); // Arrête le polling
+                    clearInterval(intervalId);
                     reject(new Error(data.error || 'Task failed'));
                 }
             } catch (error) {
-                clearInterval(intervalId); // Arrête le polling en cas d'erreur
+                clearInterval(intervalId);
                 reject(new Error('Unable to fetch task status: ' + (error as Error).message));
             }
         }, interval);

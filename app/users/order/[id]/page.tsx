@@ -81,8 +81,6 @@ export default function OrderConfirmationPage() {
             setOrderDetails(data.orderDetails);
             setOrder(data.order);
             setOrderedItems(data.orderedItems);
-            console.log(data.orderedItems);
-
           }
         } catch (error) {
           console.error("Erreur lors de la récupération des données de la commande :", error);
