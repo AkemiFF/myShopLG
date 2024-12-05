@@ -167,7 +167,7 @@ export default function ProductDetail() {
               </Card>
             </TabsContent> */}
             <TabsContent value="reviews" className="mt-4">
-              <ProductReviews reviews={product?.reviews || []} id={product?.id || 0} />
+              <ProductReviews reviews={product?.reviews || []} fetchProduct={fetchProduct} id={product?.id || 0} />
             </TabsContent>
           </Tabs>
 

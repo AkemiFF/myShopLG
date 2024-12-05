@@ -134,8 +134,7 @@ export default function AdminSettingsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="storeEmail" className="text-[#232F3E]">Email de contact</Label>
-                  <Button type="submit" onClick={clearCache} className="bg-[#FF9900] hover:bg-[#FFAC31] text-[#232F3E] font-bold">Effacer les caches</Button>
+                  <Button type="submit" onClick={clearCache} className="bg-[#ff8000] hover:bg-[#ff3131] text-[#232F3E] font-bold">Effacer les caches</Button>
                 </div>
               </CardContent>
 
