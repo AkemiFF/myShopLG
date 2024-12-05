@@ -75,7 +75,7 @@ export const initiateCartPayment = async (cartId: number, router: any) => {
             console.log(orderData);
 
             if (orderData) {
-                localStorage.setItem("cartId", cartId.toString());
+                localStorage.setItem("ref", reference);
                 const orderJson = JSON.parse(orderData);
                 orderJson.reference = reference;
                 CreateOrder(orderJson);
@@ -89,6 +89,49 @@ export const initiateCartPayment = async (cartId: number, router: any) => {
                 router.push(url)
             }
             const payStatus = await payCheck(reference);
+
+            if (payStatus) {
+                return true;
+            }
+        } else {
+            console.error('URL not found in the response:', result);
+            return false;
+
+        }
+    } catch (error) {
+        console.error('Error initiating payment:', error); return false;
+    }
+}
+
+export const initiateRefPayment = async (ref: string, router: any) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/payments/async-ref-pay/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ ref: ref })
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const run = await response.json();
+
+        const result = await fetchTaskStatus(run.task_id)
+        // Vérifiez si l'URL est présente dans le résultat
+        if (result.result && result.result?.Data?.url) {
+            const url = result.result?.Data?.url;
+            localStorage.setItem("reference_order", ref)
+            localStorage.removeItem("orderData");
+            const newWindow = window.open(url, '_blank');
+
+            if (!newWindow) {
+                alert('Popup blocked by the browser. Please allow popups for this site.');
+                router.push(url)
+            }
+            const payStatus = await payCheck(ref);
 
             if (payStatus) {
                 return true;
