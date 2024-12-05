@@ -5,23 +5,28 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
+import { useUser } from "@/context/UserContext"
 import { Review } from "@/lib/store"
 import { API_BASE_URL } from "@/utils/api"
 import getAccessToken from "@/utils/cookies"
-import { ChevronRight, Star, ThumbsUp } from 'lucide-react'
+import { format } from "date-fns"
+import { ChevronRight, Star } from 'lucide-react'
 import { SetStateAction, useState } from "react"
 import { toast } from "react-toastify"
 
 interface ProductReviewsProps {
     reviews: Review[]
     id: number
+    fetchProduct: (id: number) => void;
 }
 
-export default function ProductReviews({ reviews, id }: ProductReviewsProps) {
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [rating, setRating] = useState(0)
+export default function ProductReviews({ reviews, id, fetchProduct }: ProductReviewsProps) {
+    const { user } = useUser();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [rating, setRating] = useState(0);
     const [titleReview, setTitleReview] = useState('');
     const [contentReview, setContentReview] = useState('');
+    const [displayedReviews, setDisplayedReviews] = useState(4);
 
     const handleTitleChange = (e: { target: { value: SetStateAction<string> } }) => {
         setTitleReview(e.target.value);
@@ -30,6 +35,18 @@ export default function ProductReviews({ reviews, id }: ProductReviewsProps) {
     const handleContentChange = (e: { target: { value: SetStateAction<string> } }) => {
         setContentReview(e.target.value);
     };
+
+    const handleReviewAdd = (e: any) => {
+        if (user) {
+            setIsModalOpen(true);
+        } else {
+            toast.error('Veuillez vous connecter pour ajouter un avis', {
+                delay: 300,
+                theme: "colored"
+            });
+        }
+
+    }
     const createReview = async (reviewData: any) => {
         const access = await getAccessToken();
         try {
@@ -47,16 +64,26 @@ export default function ProductReviews({ reviews, id }: ProductReviewsProps) {
             }
 
             const data = await response.json();
-            toast.info('Succès', {
-                delay: 800,
+            toast.info('Avis ajouté', {
+                delay: 300,
                 theme: "colored"
             })
+            await fetchProduct(id);
             return data;
         } catch (error) {
             console.error('Erreur:', error);
+            toast.info('Vous ne pouvez pas ajouter plus d\'un avis', {
+                delay: 300,
+                theme: "colored"
+            })
             return null;
         }
     };
+
+
+    const handleSeeMoreReviews = () => {
+        setDisplayedReviews(prev => prev + 5)
+    }
 
     const handleSubmitReview = (event: React.FormEvent) => {
         event.preventDefault()
@@ -76,14 +103,14 @@ export default function ProductReviews({ reviews, id }: ProductReviewsProps) {
                 <CardTitle className="text-2xl font-bold">Customer Reviews</CardTitle>
                 <Button
                     className="bg-orange-500 hover:bg-orange-600 text-white"
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={handleReviewAdd}
                 >
                     Write a customer review
                 </Button>
             </CardHeader>
             <CardContent>
                 <div className="space-y-6">
-                    {reviews.map((review) => (
+                    {reviews.slice(0, displayedReviews).map((review) => (
                         <div key={review.id} className="pb-6 last:pb-0">
                             <div className="flex items-center space-x-2 mb-2">
                                 <div className="flex">
@@ -98,23 +125,25 @@ export default function ProductReviews({ reviews, id }: ProductReviewsProps) {
                                 <span className="font-bold text-lg">{review.title}</span>
                             </div>
                             <div className="text-sm text-gray-500 mb-2">
-                                {review.author} | {review.date}
+                                {review.username.replaceAll("_", " ")} | {format(new Date(review.created_at), 'dd MMM yyyy, HH:mm:ss')}
                             </div>
                             <p className="text-gray-700 mb-4">{review.content}</p>
-                            <div className="flex items-center text-sm text-gray-500">
-                                <ThumbsUp className="h-4 w-4 mr-1" />
-                                <span>{review.helpful} people found this helpful</span>
-                            </div>
                             <Separator className="my-4" />
                         </div>
                     ))}
                 </div>
-                <div className="mt-6 flex justify-center">
-                    <Button variant="link" className="text-blue-600 hover:text-orange-500 flex items-center">
-                        See all reviews
-                        <ChevronRight className="ml-1 h-4 w-4" />
-                    </Button>
-                </div>
+                {displayedReviews < reviews.length && (
+                    <div className="mt-6 flex justify-center">
+                        <Button
+                            variant="link"
+                            className="text-blue-600 hover:text-orange-500 flex items-center"
+                            onClick={handleSeeMoreReviews}
+                        >
+                            See more reviews
+                            <ChevronRight className="ml-1 h-4 w-4" />
+                        </Button>
+                    </div>
+                )}
             </CardContent>
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
