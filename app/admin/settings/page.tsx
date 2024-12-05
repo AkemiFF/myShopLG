@@ -5,12 +5,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
-import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useStoreSettings } from '@/context/StoreSettingsContext'
+import { API_BASE_URL } from "@/utils/api"
+import getAccessToken from "@/utils/cookies"
 import { AlertCircle, CheckCircle2 } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from "react-toastify"
 
 export default function AdminSettingsPage() {
   const { storeSettings, setStoreSettings } = useStoreSettings();
@@ -67,6 +68,36 @@ export default function AdminSettingsPage() {
     setTimeout(() => setSuccessMessage(''), 3000)
   }
 
+  async function clearCache() {
+    try {
+      const access = await getAccessToken()
+      const response = await fetch(`${API_BASE_URL}/api/clear-cache/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${access}`
+        },
+
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to clear cache');
+      }
+
+      const data = await response.json();
+      console.log('Cache Effacé:', data.message);
+      toast.success(data.message, {
+        position: 'top-right',
+        autoClose: 500,
+      });
+      alert('Cache cleared successfully');
+    } catch (error) {
+      console.error('Error clearing cache:', error);
+      alert('Error clearing cache');
+    }
+  }
+
+
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6 bg-[#EAEDED]">
       <h1 className="text-3xl font-bold text-[#232F3E]">Paramètres</h1>
@@ -89,7 +120,7 @@ export default function AdminSettingsPage() {
 
       <Tabs defaultValue="store" className="space-y-4">
         <TabsList className="bg-[#232F3E] text-white">
-          <TabsTrigger value="store" className="data-[state=active]:bg-[#FF9900] data-[state=active]:text-[#232F3E]">Paramètres du magasin</TabsTrigger>
+          <TabsTrigger value="store" className="data-[state=active]:bg-[#FF9900] data-[state=active]:text-[#232F3E]">Cache</TabsTrigger>
           <TabsTrigger value="account" className="data-[state=active]:bg-[#FF9900] data-[state=active]:text-[#232F3E]">Compte administrateur</TabsTrigger>
         </TabsList>
         <TabsContent value="store">
@@ -98,75 +129,16 @@ export default function AdminSettingsPage() {
               <CardHeader>
                 <CardTitle className="text-2xl text-[#232F3E]">Paramètres du magasin</CardTitle>
                 <CardDescription className="text-[#545B64]">
-                  Gérez les informations et les paramètres de votre boutique en ligne.
+                  Effacer les caches en cas de cache plein
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="storeName" className="text-[#232F3E]">Nom du magasin</Label>
-                  <Input
-                    id="storeName"
-                    name="name"
-                    value={settings.name}
-                    onChange={handlesettingsChange}
-                    className="border-[#D5D9D9] focus:border-[#FF9900] focus:ring-[#FF9900]"
-                  />
-                </div>
-                <div className="space-y-2">
                   <Label htmlFor="storeEmail" className="text-[#232F3E]">Email de contact</Label>
-                  <Input
-                    id="storeEmail"
-                    name="email"
-                    type="email"
-                    value={settings.email}
-                    onChange={handlesettingsChange}
-                    className="border-[#D5D9D9] focus:border-[#FF9900] focus:ring-[#FF9900]"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="storeAddress" className="text-[#232F3E]">Adresse</Label>
-                  <Input
-                    id="storeAddress"
-                    name="address"
-                    value={settings.address}
-                    onChange={handlesettingsChange}
-                    className="border-[#D5D9D9] focus:border-[#FF9900] focus:ring-[#FF9900]"
-                  />
-                </div>
-                <Separator className="my-4" />
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="allowGuestCheckout" className="text-[#232F3E]">Autoriser les achats sans compte</Label>
-                    <Switch
-                      id="allowGuestCheckout"
-                      checked={settings.allowGuestCheckout}
-                      onCheckedChange={() => handleToggleChange('allowGuestCheckout')}
-                      className="data-[state=checked]:bg-[#FF9900]"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="enableReviews" className="text-[#232F3E]">Activer les avis produits</Label>
-                    <Switch
-                      id="enableReviews"
-                      checked={settings.enableReviews}
-                      onCheckedChange={() => handleToggleChange('enableReviews')}
-                      className="data-[state=checked]:bg-[#FF9900]"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="enableWishlist" className="text-[#232F3E]">Activer la liste de souhaits</Label>
-                    <Switch
-                      id="enableWishlist"
-                      checked={settings.enableWishlist}
-                      onCheckedChange={() => handleToggleChange('enableWishlist')}
-                      className="data-[state=checked]:bg-[#FF9900]"
-                    />
-                  </div>
+                  <Button type="submit" onClick={clearCache} className="bg-[#FF9900] hover:bg-[#FFAC31] text-[#232F3E] font-bold">Effacer les caches</Button>
                 </div>
               </CardContent>
-              <CardFooter>
-                <Button type="submit" className="bg-[#FF9900] hover:bg-[#FFAC31] text-[#232F3E] font-bold">Enregistrer les modifications</Button>
-              </CardFooter>
+
             </form>
           </Card>
         </TabsContent>
