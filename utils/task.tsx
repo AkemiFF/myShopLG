@@ -18,7 +18,7 @@ async function fetchTaskStatus(taskId: string, interval = 2000): Promise<TaskSta
     return new Promise((resolve, reject) => {
         const intervalId = setInterval(async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/api/get-task-status/?task_id=${taskId}`);
+                const response = await fetch(`${API_BASE_URL}/payments/get-task-status/?task_id=${taskId}`);
                 const data: TaskStatusResponse = await response.json();
 
                 if (data.state === 'SUCCESS') {
