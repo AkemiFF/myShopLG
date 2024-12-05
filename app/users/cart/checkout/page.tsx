@@ -217,6 +217,12 @@ export default function CheckoutPage() {
         autoClose: 700,
       });
       router.push('/users/cart/order-confirmation');
+    } else {
+      setIsPaying(false);
+      toast.error("Une erreur s'est produit, veuiller rééssayer", {
+        theme: "colored",
+        autoClose: 1000,
+      });
     }
     return true
   }

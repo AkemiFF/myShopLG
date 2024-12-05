@@ -1,11 +1,12 @@
 "use client"
 
+import LoadingSpinner from "@/components/LoadingSpinner"
 import { SkeletonLoader } from "@/components/skeleton/SkeletonLoader"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { API_BASE_URL } from "@/utils/api"
 import getAccessToken from "@/utils/cookies"
-import { initiateCartPayment } from "@/utils/payments"
+import { initiateRefPayment } from "@/utils/payments"
 import { AlertTriangle, Check } from 'lucide-react'
 import { useParams, useRouter } from "next/navigation"
 import { useEffect, useState } from 'react'
@@ -73,6 +74,8 @@ export default function OrderConfirmationPage() {
   const [orderedItems, setOrderedItems] = useState<OrderedItems[]>(baseItems);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const [isPaying, setIsPaying] = useState(false);
+
   useEffect(() => {
     const fetchOrderData = async () => {
       if (id) {
@@ -96,12 +99,11 @@ export default function OrderConfirmationPage() {
   }, [id]);
 
   const handlePayNow = async () => {
-    const cartId = localStorage.getItem("cartId");
-    if (cartId) {
-      await initiateCartPayment(parseInt(cartId), router)
+    const ref = localStorage.getItem("ref");
+    if (ref) {
+      setIsPaying(true);
+      await initiateRefPayment(ref, router);
     }
-
-    console.log("Paiement en cours...");
   };
 
   if (isLoading) {
@@ -116,6 +118,7 @@ export default function OrderConfirmationPage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <LoadingSpinner visible={isPaying} />
       <main className="container mx-auto py-8">
 
 
