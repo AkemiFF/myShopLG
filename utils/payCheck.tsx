@@ -26,7 +26,7 @@ export const payCheck = (ref: string): Promise<boolean> => {
             }
         };
 
-        const intervalId = setInterval(checkPaymentStatus, 5000);
+        const intervalId = setInterval(checkPaymentStatus, 10000);
 
         setTimeout(() => {
             clearInterval(intervalId);

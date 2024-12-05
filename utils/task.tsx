@@ -14,7 +14,7 @@ type TaskStatusResponse = {
     error?: string;
 };
 
-async function fetchTaskStatus(taskId: string, interval = 7000): Promise<TaskStatusResponse> {
+async function fetchTaskStatus(taskId: string, interval = 20000): Promise<TaskStatusResponse> {
     return new Promise((resolve, reject) => {
         const intervalId = setInterval(async () => {
             try {
