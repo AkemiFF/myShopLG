@@ -152,7 +152,7 @@ export default function OrderConfirmationPage() {
                 <div className="space-y-4">
                   {orderedItems.map((item) => (
                     <div key={item.id} className="flex space-x-4">
-                      <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded" />
+                      <img src={API_BASE_URL + item.image} alt={item.name} className="w-20 h-20 object-cover rounded" />
                       <div>
                         <h3 className="font-semibold">{item.name}</h3>
                         <p className="text-gray-600">Quantité: {item.quantity}</p>
