@@ -13,7 +13,7 @@ export default function LoginPage() {
         console.log(data);
     }
     useEffect(() => {
-        const res = payCheck('REF4835T150P0')
+        const res = payCheck()
         console.log(Promise.resolve(res));
 
     }, []);
