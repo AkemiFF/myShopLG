@@ -16,8 +16,9 @@ export const payCheck = (): Promise<boolean> => {
                         theme: "colored",
                         autoClose: 3000,
                     });
+                    localStorage.removeItem("reference_order");
                     clearInterval(intervalId);
-                    resolve(true); // Resolve the promise with true
+                    resolve(true);
                 } else {
                     console.log('Payment not confirmed yet, checking again...');
                 }
