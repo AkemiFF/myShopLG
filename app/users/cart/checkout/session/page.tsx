@@ -226,11 +226,6 @@ export default function CheckoutSessionPage() {
         const created = await createClient(clientData);
         if (created.success) {
             await handlePayement();
-        } else {
-            toast.error("Erreur lors de la création du compte. Veuillez réessayer.", {
-                theme: "colored",
-                autoClose: 2000,
-            });
         }
     }
 

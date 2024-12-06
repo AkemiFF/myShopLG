@@ -11,11 +11,8 @@ export default function OrderConfirmation() {
   const [isOrderAccepted, setIsOrderAccepted] = useState<boolean | null>(null)
 
   useEffect(() => {
-    const ref = localStorage.getItem("reference_order");
-    console.log(ref);
-
-    const verifyOrder = async (ref: string) => {
-      const check = await payCheck(ref);
+    const verifyOrder = async () => {
+      const check = await payCheck();
       console.log(check);
 
       if (check) {
@@ -26,10 +23,7 @@ export default function OrderConfirmation() {
         setIsLoading(false);
       }
     }
-    if (ref) {
-      verifyOrder(ref);
-    }
-
+    verifyOrder();
   }, [])
 
   return (

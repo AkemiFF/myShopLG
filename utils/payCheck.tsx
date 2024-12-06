@@ -1,7 +1,8 @@
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "./api";
 
-export const payCheck = (ref: string): Promise<boolean> => {
+export const payCheck = (): Promise<boolean> => {
+    const ref = localStorage.getItem("reference_order");
     return new Promise((resolve) => {
         const checkPaymentStatus = async () => {
             try {
