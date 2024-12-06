@@ -1,5 +1,6 @@
 "use client"
 import LoadingSpinner from "@/components/LoadingSpinner"
+import { CartSkeleton } from "@/components/skeleton/CartSkeleton"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DialogHeader } from "@/components/ui/dialog"
@@ -9,12 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useUser } from "@/context/UserContext"
 import { API_BASE_URL } from '@/utils/api'
 import { setTokens } from '@/utils/cookies'
+import generatePassword from "@/utils/password"
 import { initiateCartPayment } from "@/utils/payments"
 import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog"
-import { AlertCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
+
 interface CartItem {
     product_id: number;
     product_name: string;
@@ -30,6 +32,7 @@ interface Country {
 }
 export default function CheckoutSessionPage() {
     const [cartItems, setCartItems] = React.useState<CartItem[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
     const [number, setNumber] = useState<string>('');
     const [cartId, setCartId] = useState<number>(0);
@@ -40,15 +43,11 @@ export default function CheckoutSessionPage() {
     const [postalCode, setPostalCode] = useState('');
     const [country, setCountry] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
     const [isPaying, setIsPaying] = useState(false);
     const router = useRouter();
     const total = subtotal
     const { user, setUser } = useUser();
 
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
     const [countryList, setCountryList] = useState<Country[]>([]);
     const [isSaved, setSaved] = useState(false);
     useEffect(() => {
@@ -59,59 +58,8 @@ export default function CheckoutSessionPage() {
             });
     }, []);
 
-    const handleAddPassword = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (password !== confirmPassword) {
-            setError('Les mots de passe ne correspondent pas.')
-            return
-        }
-
-        if (password.length < 8) {
-            setError('Doit faire au moins 8 caractères')
-            return
-        }
-
-        if (!/[A-Z]/.test(password)) {
-            setError('Le mot de passe doit contenir au moins une lettre majuscule.');
-            return;
-        }
-
-        if (!/[a-z]/.test(password)) {
-            setError('Le mot de passe doit contenir au moins une lettre minuscule.');
-            return;
-        }
-
-        if (!/[0-9]/.test(password)) {
-            setError('Le mot de passe doit contenir au moins un chiffre.');
-            return;
-        }
-
-        const clientData = {
-            username: lastName.replace(/ /g, "_") + '_' + email,
-            password: password,
-            phone_number: number,
-            address: address,
-            email: email,
-            shipping_address: {
-                address: address,
-                city: city,
-                postal_code: postalCode,
-                country: country,
-                phone_number: number
-            }
-        };
-
-        const created = await createClient(clientData);
-
-        if (created.success) {
-            setIsDialogOpen(true);
-        } else {
-            showAlert('Vous avez déjà un compte lié à l\'email');
-        }
-    }
 
     const createClient = async (clientData: any) => {
-
         try {
             const response = await fetch(`${API_BASE_URL}/api/create/order/`, {
                 method: 'POST',
@@ -124,6 +72,11 @@ export default function CheckoutSessionPage() {
 
             if (!response.ok) {
                 const errorData = await response.json();
+                toast.error("Vous avez déjà un compte lié à cette email, veullez vous connecter ou choisir un autre email", {
+                    theme: "colored",
+                    autoClose: 800,
+                });
+
                 return { success: false, data: errorData };
             }
 
@@ -131,10 +84,9 @@ export default function CheckoutSessionPage() {
             setTokens(data.access, data.refresh);
             setUser(data.user);
             saveOrderData(data.user.id);
-            console.log(data.user.id);
+
 
             setSaved(true);
-            setIsPasswordDialogOpen(false);
             toast.info('Compte créé avec succès', {
                 theme: "colored",
                 autoClose: 500,
@@ -143,7 +95,7 @@ export default function CheckoutSessionPage() {
         } catch (error) {
             toast.error('Vous avez déjà un compte lié à l\'email', {
                 theme: "colored",
-                autoClose: 500,
+                autoClose: 1000,
             });
             return { success: false, error: 'Erreur réseau' };
         }
@@ -192,7 +144,7 @@ export default function CheckoutSessionPage() {
     }
 
     const fetchCartItems = async () => {
-
+        setIsLoading(true);
         try {
             const response = await fetch(`${API_BASE_URL}/api/cart/session/`, {
                 headers: {
@@ -214,11 +166,10 @@ export default function CheckoutSessionPage() {
         } catch (error) {
             router.push("/users");
             // console.error("Erreur:", error);
+        } finally {
+            setIsLoading(false);
         }
-
     };
-
-
 
     useEffect(() => {
         fetchCartItems();
@@ -246,7 +197,8 @@ export default function CheckoutSessionPage() {
         if (!isSaved) {
             const check = checkForm();
             if (check) {
-                setIsPasswordDialogOpen(true);
+
+                setIsDialogOpen(true);
             }
         } else {
             handleSubmit();
@@ -255,7 +207,31 @@ export default function CheckoutSessionPage() {
 
     const handleSubmit = async () => {
         setIsDialogOpen(false);
-        await handlePayement();
+
+        const clientData = {
+            username: lastName.replace(/ /g, "_") + '_' + email,
+            password: generatePassword({ postalCode, lastName, email }),
+            phone_number: number,
+            address: address,
+            email: email,
+            shipping_address: {
+                address: address,
+                city: city,
+                postal_code: postalCode,
+                country: country,
+                phone_number: number
+            }
+        };
+
+        const created = await createClient(clientData);
+        if (created.success) {
+            await handlePayement();
+        } else {
+            toast.error("Erreur lors de la création du compte. Veuillez réessayer.", {
+                theme: "colored",
+                autoClose: 2000,
+            });
+        }
     }
 
     const saveOrderData = (id: number) => {
@@ -303,7 +279,7 @@ export default function CheckoutSessionPage() {
                                                     id="lastName"
                                                     placeholder="Doe"
                                                     value={lastName}
-                                                    onChange={(e) => setLastName(e.target.value)} // Mettre à jour l'état
+                                                    onChange={(e) => setLastName(e.target.value)}
                                                 />
                                             </div>
                                             <div>
@@ -312,7 +288,7 @@ export default function CheckoutSessionPage() {
                                                     id="contact"
                                                     placeholder="+01 00 000 000"
                                                     value={number}
-                                                    onChange={(e) => setNumber(e.target.value)} // Mettre à jour l'état
+                                                    onChange={(e) => setNumber(e.target.value)}
                                                 />
                                             </div>
                                             <div>
@@ -321,7 +297,7 @@ export default function CheckoutSessionPage() {
                                                     id="email"
                                                     placeholder="trucdechose@truc.truc"
                                                     value={email}
-                                                    onChange={(e) => setEmail(e.target.value)} // Mettre à jour l'état
+                                                    onChange={(e) => setEmail(e.target.value)}
                                                 />
                                             </div>
 
@@ -332,7 +308,7 @@ export default function CheckoutSessionPage() {
                                                 id="address"
                                                 placeholder="123 Rue Principale"
                                                 value={address}
-                                                onChange={(e) => setAddress(e.target.value)} // Mettre à jour l'état
+                                                onChange={(e) => setAddress(e.target.value)}
                                             />
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
@@ -342,7 +318,7 @@ export default function CheckoutSessionPage() {
                                                     id="city"
                                                     placeholder="Paris"
                                                     value={city}
-                                                    onChange={(e) => setCity(e.target.value)} // Mettre à jour l'état
+                                                    onChange={(e) => setCity(e.target.value)}
                                                 />
                                             </div>
                                             <div>
@@ -351,13 +327,13 @@ export default function CheckoutSessionPage() {
                                                     id="postalCode"
                                                     placeholder="75000"
                                                     value={postalCode}
-                                                    onChange={(e) => setPostalCode(e.target.value)} // Mettre à jour l'état
+                                                    onChange={(e) => setPostalCode(e.target.value)}
                                                 />
                                             </div>
                                         </div>
                                         <div>
                                             <Label htmlFor="country">Pays</Label>
-                                            <Select value={country} onValueChange={setCountry}> {/* Mettre à jour l'état */}
+                                            <Select value={country} onValueChange={setCountry}>
                                                 <SelectTrigger id="country">
                                                     <SelectValue placeholder="Sélectionnez un pays" />
                                                 </SelectTrigger>
@@ -381,36 +357,40 @@ export default function CheckoutSessionPage() {
                                     <CardTitle>Résumé de la commande</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="space-y-2">
-                                        {cartItems.map((item) => (
-                                            <div key={item.product_id} className="flex justify-between">
-                                                <span>{item.product_name} (x{item.quantity})</span>
-                                                <span>{(item.price * item.quantity).toFixed(2)} €</span>
+                                    {isLoading ? (
+                                        <CartSkeleton />
+                                    ) : (
+                                        <div className="space-y-2">
+                                            {cartItems.map((item) => (
+                                                <div key={item.product_id} className="flex justify-between">
+                                                    <span>{item.product_name} (x{item.quantity})</span>
+                                                    <span>{(item.price * item.quantity).toFixed(2)} €</span>
+                                                </div>
+                                            ))}
+                                            <div className="border-t pt-2 mt-2">
+                                                <div className="flex justify-between">
+                                                    <span>Sous-total</span>
+                                                    <span>{subtotal.toFixed(2)} €</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span>Frais de livraison</span>
+                                                    <span>Inclus</span>
+                                                </div>
+                                                <div className="flex justify-between font-bold text-lg mt-2">
+                                                    <span>Total</span>
+                                                    <span>{total.toFixed(2)} €</span>
+                                                </div>
                                             </div>
-                                        ))}
-                                        <div className="border-t pt-2 mt-2">
-                                            <div className="flex justify-between">
-                                                <span>Sous-total</span>
-                                                <span>{subtotal.toFixed(2)} €</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span>Frais de livraison</span>
-                                                <span>Inclus</span>
-                                            </div>
-                                            <div className="flex justify-between font-bold text-lg mt-2">
-                                                <span>Total</span>
-                                                <span>{total.toFixed(2)} €</span>
-                                            </div>
-
                                         </div>
-                                    </div>
-                                    <Button className="w-full mt-4" onClick={handleConfirmOrder}>Confirmer la commande</Button>
+                                    )}
+                                    <Button className="w-full mt-4" onClick={handleConfirmOrder} disabled={isLoading}>
+                                        {isLoading ? 'Chargement...' : 'Confirmer la commande'}
+                                    </Button>
 
                                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-
                                         <DialogContent aria-describedby="truc" aria-description="Truc" className="w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-background p-6 rounded-lg shadow-2xl">
                                             <DialogHeader className="mb-4">
-                                                <DialogTitle className="text-2xl font-bold">Confirmation de la commande</DialogTitle>
+                                                <DialogTitle className="text-2xl font-bold">Confirmation des informations</DialogTitle>
                                             </DialogHeader>
                                             <div className="grid gap-6">
                                                 <div className="grid gap-4 sm:grid-cols-2">
@@ -422,99 +402,35 @@ export default function CheckoutSessionPage() {
                                                         <Label className="font-semibold">Email:</Label>
                                                         <span>{email}</span>
                                                     </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="font-semibold">Téléphone:</Label>
+                                                        <span>{number}</span>
+                                                    </div>
                                                     <div className="space-y-2 sm:col-span-2">
                                                         <Label className="font-semibold">Adresse:</Label>
                                                         <span>{address}, {city}, {postalCode}, {country}</span>
                                                     </div>
                                                 </div>
                                                 <div className="border-t border-gray-200 pt-4">
-                                                    <h4 className="font-bold text-lg mb-3">Résumé de la commande:</h4>
-                                                    <div className="space-y-2">
-                                                        {cartItems.map((item) => (
-                                                            <div key={item.product_id} className="flex justify-between items-center">
-                                                                <span>{item.product_name} (x{item.quantity})</span>
-                                                                <span className="font-semibold">{(item.price * item.quantity).toFixed(2)} €</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                    <div className="border-t border-gray-200 mt-4 pt-4">
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="font-semibold">Sous-total:</span>
-                                                            <span>{subtotal.toFixed(2)} €</span>
-                                                        </div>
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="font-semibold">Frais de livraison:</span>
-                                                            <span>Inclus</span>
-                                                        </div>
-                                                        <div className="flex justify-between items-center text-lg font-bold mt-2">
-                                                            <span>Total:</span>
-                                                            <span>{total.toFixed(2)} €</span>
-                                                        </div>
-                                                    </div>
+                                                    <p className="text-sm text-gray-600 mb-4">
+                                                        Veuillez noter que ces informations ne pourront pas être modifiées pour cette commande.
+                                                        Votre mot de passe sera envoyé à l'adresse email fournie.
+                                                    </p>
                                                 </div>
                                                 <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
-                                                    <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="w-full sm:w-auto">Annuler</Button>
-                                                    <Button onClick={handleSubmit} className="w-full sm:w-auto">Confirmer la commande</Button>
+                                                    <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="w-full sm:w-auto">Modifier</Button>
+                                                    <Button onClick={handleSubmit} className="w-full sm:w-auto">Confirmer et payer</Button>
                                                 </div>
                                             </div>
-                                        </DialogContent>
-                                    </Dialog>
-                                    <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
-
-                                        <DialogContent className="w-11/12 max-w-md overflow-y-auto fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-background p-6 rounded-lg shadow-2xl">
-                                            <DialogHeader className="mb-4">
-                                                <DialogTitle className="text-2xl font-bold">Créer un mot de passe</DialogTitle>
-                                            </DialogHeader>
-                                            <form onSubmit={handleAddPassword} className="space-y-6">
-                                                <div className="space-y-4">
-                                                    <div className="space-y-2">
-                                                        <Label htmlFor="password" className="font-semibold">
-                                                            Mot de passe
-                                                        </Label>
-                                                        <Input
-                                                            id="password"
-                                                            type="password"
-                                                            value={password}
-                                                            onChange={(e) => setPassword(e.target.value)}
-                                                            required
-                                                            className="w-full px-3 py-2 border rounded-md" />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label htmlFor="confirmPassword" className="font-semibold">
-                                                            Confirmer le mot de passe
-                                                        </Label>
-                                                        <Input
-                                                            id="confirmPassword"
-                                                            type="password"
-                                                            value={confirmPassword}
-                                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                                            required
-                                                            className="w-full px-3 py-2 border rounded-md" />
-                                                    </div>
-                                                </div>
-                                                {error && (
-                                                    <div className="flex items-center space-x-2 text-red-600" role="alert">
-                                                        <AlertCircle size={20} />
-                                                        <span>{error}</span>
-                                                    </div>
-                                                )}
-                                                <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
-                                                    <Button variant="outline" onClick={() => setIsPasswordDialogOpen(false)} className="w-full sm:w-auto">
-                                                        Annuler
-                                                    </Button>
-                                                    <Button type="submit" className="w-full sm:w-auto">
-                                                        Confirmer
-                                                    </Button>
-                                                </div>
-                                            </form>
                                         </DialogContent>
                                     </Dialog>
                                 </CardContent>
                             </Card>
                         </div>
-
                     </div>
                 </main>
-            </div></>
+            </div>
+        </>
     )
 }
+
