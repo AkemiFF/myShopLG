@@ -182,7 +182,7 @@ export default function CartPage() {
                                     <CardTitle>Articles dans votre panier</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    {cartItems.map((item) => (
+                                    {cartItems ? cartItems.map((item) => (
                                         <div key={item.product_id} className="flex items-center space-x-4 py-4 border-b last:border-b-0">
                                             <img src={item.image_url ? API_BASE_URL + item.image_url : "/placeholder.svg"} alt={item.product_name} className="w-24 h-24 object-cover rounded" />
                                             <div className="flex-1">
@@ -203,7 +203,7 @@ export default function CartPage() {
                                                 <X className="h-4 w-4" />
                                             </Button>
                                         </div>
-                                    ))}
+                                    )) : null}
                                 </CardContent>
                             </Card>
                         )}
@@ -280,9 +280,12 @@ export default function CartPage() {
                     <div className="mt-12">
                         <h2 className="text-2xl font-bold mb-4">Recommandations</h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {recommendedProducts.map((item) => (
-                                <ProductCard key={item.id} product={item} />
-                            ))}
+                            {recommendedProducts ? (
+                                recommendedProducts.map((item) => (
+                                    <ProductCard key={item.id} product={item} />
+                                ))
+                            ) : null
+                            }
                         </div>
                     </div>
                 )
