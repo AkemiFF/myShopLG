@@ -1,1 +1,8 @@
-<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg"><linearGradient id="lg"><stop offset="0%" stop-color="#ab1e0c"/><stop offset="100%" stop-color="#19154a"/></linearGradient><rect x="2" y="2" width="296" height="296" style="fill:url(#lg);stroke:#59ffbf;stroke-width:2"/><text x="50%" y="50%" font-size="18" text-anchor="middle" alignment-baseline="middle" font-family="monospace, sans-serif" fill="#59ffbf">no img</text></svg>
+<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+  <linearGradient id="lg">
+    <stop offset="0%" stop-color="#cb6948"/> <!-- rouille claire -->
+    <stop offset="100%" stop-color="#8c8c4a"/> <!-- olive foncé -->
+  </linearGradient>
+  <rect x="2" y="2" width="296" height="296" style="fill:url(#lg);stroke:#e28a6e;stroke-width:2"/> <!-- contour plus doux -->
+  <text x="50%" y="50%" font-size="18" text-anchor="middle" alignment-baseline="middle" font-family="monospace, sans-serif" fill="#e28a6e">no img</text>
+</svg>
