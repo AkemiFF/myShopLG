@@ -4,8 +4,8 @@ import { API_BASE_URL } from "./api";
 type TaskStatusResponse = {
     state: string;
     result?: {
-        CodeRetour: number;
-        DescRetour: string;
+        checkout_url: string;
+        id: string;
         Data?: {
             url?: string;
         };
