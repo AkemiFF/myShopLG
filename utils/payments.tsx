@@ -28,7 +28,6 @@ export const initiateCartPayment = async (cartId: number, router: any) => {
             const url = result.result?.Data?.url;
             const reference = result.result?.reference;
             const orderData = localStorage.getItem("orderData");
-            console.log(result.result);
 
             if (orderData) {
                 localStorage.setItem("reference_order", reference);
