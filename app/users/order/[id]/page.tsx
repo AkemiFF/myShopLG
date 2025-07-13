@@ -218,10 +218,12 @@ export default function OrderConfirmationPage() {
                     <span>Total</span>
                     <span>{orderDetails.totalAmount.toFixed(2)} €</span>
                   </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Numéro de commande</span>
-                    <span>{orderDetails.orderNumber}</span>
-                  </div>
+                    <div className="flex justify-between text-gray-600">
+                      <span>Numéro de commande</span>
+                      <span className="break-words max-w-[150px]" title={orderDetails.orderNumber}>
+                      {orderDetails.orderNumber}
+                      </span>
+                    </div>
                 </div>
               </CardContent>
             </Card>
