@@ -22,13 +22,14 @@ export const initiateCartPayment = async (cartId: number, router: any) => {
 
         const run = await response.json();
 
-        const result = await fetchTaskStatus(run.task_id)
-        // Vérifiez si l'URL est présente dans le résultat
-        if (result.result && result.result?.Data?.url) {
-            const url = result.result?.Data?.url;
-            const reference = result.result?.reference;
+        const data = await fetchTaskStatus(run.task_id)
+        
+        console.log(data);
+        if (data.result && data.result?.checkout_url) {
+            const url = data.result?.checkout_url;
+            const reference = data.result?.id;
             const orderData = localStorage.getItem("orderData");
-
+            console.log("reference ",reference);
             if (orderData) {
                 localStorage.setItem("reference_order", reference);
                 const orderJson = JSON.parse(orderData);
@@ -49,7 +50,7 @@ export const initiateCartPayment = async (cartId: number, router: any) => {
                 return true;
             }
         } else {
-            console.error('URL not found in the response:', result);
+            console.error('URL not found in the response:', data);
             return false;
 
         }
