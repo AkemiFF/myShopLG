@@ -4,58 +4,79 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 220.9 39.3% 11%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 224 71.4% 4.1%;
+    /* Palette artisanale claire */
+    --background: 45 33% 95%;          /* Crème lin */
+    --foreground: 0 0% 18%;            /* Noir charbon */
+    --card: 45 33% 95%;
+    --card-foreground: 0 0% 18%;
+    --popover: 45 33% 95%;
+    --popover-foreground: 0 0% 18%;
+
+    --primary: 15 56% 54%;             /* Rouille douce */
+    --primary-foreground: 45 33% 95%;  /* Crème */
+
+    --secondary: 99 14% 68%;           /* Vert sauge */
+    --secondary-foreground: 0 0% 18%;
+
+    --muted: 35 30% 80%;               /* Beige sable */
+    --muted-foreground: 30 15% 30%;
+
+    --accent: 14 54% 65%;  /* Nouvelle rouille claire (#e28a6e) */
+    
+    --accent-foreground: 0 0% 100%; /* meilleur contraste blanc */
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 45 33% 95%;
+
+    --border: 25 20% 65%;              /* Brun clair */
+    --input: 25 20% 65%;
+    --ring: 15 56% 54%;
+
     --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+
+    /* Couleurs graphiques */
+    --chart-1: 27 87% 67%;    /* orange artisan */
+    --chart-2: 99 20% 48%;    /* vert olive */
+    --chart-3: 15 56% 40%;    /* terre cuite */
+    --chart-4: 42 73% 58%;    /* moutarde */
+    --chart-5: 0 25% 55%;     /* rouge brique */
   }
 
   .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 210 20% 98%;
-    --primary-foreground: 220.9 39.3% 11%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 216 12.2% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    /* Palette artisanale sombre */
+    --background: 0 0% 18%;            /* Noir charbon */
+    --foreground: 45 33% 95%;          /* Crème */
+
+    --card: 0 0% 18%;
+    --card-foreground: 45 33% 95%;
+
+    --popover: 0 0% 18%;
+    --popover-foreground: 45 33% 95%;
+
+    --primary: 10 55% 55%;             /* Terracotta */
+    --primary-foreground: 45 33% 95%;
+
+    --secondary: 65 10% 40%;           /* Vert olive foncé */
+    --secondary-foreground: 45 33% 95%;
+
+    --muted: 25 15% 30%;               /* Brun doux */
+    --muted-foreground: 30 15% 70%;
+
+    --accent: 42 60% 55%;              /* Moutarde foncé */
+    --accent-foreground: 0 0% 18%;
+
+    --destructive: 0 55% 35%;
+    --destructive-foreground: 45 33% 95%;
+
+    --border: 25 15% 35%;              /* Gris chaud */
+    --input: 25 15% 35%;
+    --ring: 42 60% 55%;
+
+    --chart-1: 27 87% 67%;
+    --chart-2: 99 20% 48%;
+    --chart-3: 10 55% 40%;
+    --chart-4: 42 73% 58%;
+    --chart-5: 0 25% 55%;
   }
 }
 
