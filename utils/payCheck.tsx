@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 import { API_BASE_URL } from "./api";
 
 export const payCheck = (): Promise<boolean> => {
-    const ref = localStorage.getItem("reference_order");
+    let ref = localStorage.getItem("reference_order");
     return new Promise((resolve) => {
         const checkPaymentStatus = async () => {
             try {
@@ -16,11 +16,12 @@ export const payCheck = (): Promise<boolean> => {
                         theme: "colored",
                         autoClose: 3000,
                     });
-                    localStorage.removeItem("reference_order");
+                    // localStorage.removeItem("reference_order");
                     clearInterval(intervalId);
                     resolve(true);
                 } else {
-                    console.log('Payment not confirmed yet, checking again...');
+                    ref = localStorage.getItem("reference_order");
+                    console.log('Payment not confirmed yet, checking again... ref: ',ref);
                 }
             } catch (error) {
                 console.error('Fetch error:', error);
